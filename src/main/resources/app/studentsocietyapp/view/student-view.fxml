@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefWidth="800" stylesheets="@studentview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.studentsocietyapp.controller.StudentController">
+    <!-- Header Section -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #4A90E2; -fx-padding: 10;">
+            <!-- Logo -->
+            <ImageView fx:id="logoImage" fitHeight="40" fitWidth="40">
+                <Image url="https://imgur.com/a/fast-logo-z0z1kqR" />
+            </ImageView>
+            <!-- Application Title -->
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="FAST NU ECHO" />
+            <!-- Spacer -->
+            <HBox HBox.hgrow="ALWAYS" />
+            <!-- Welcome Text -->
+            <Label fx:id="welcomeLabel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Welcome, [User Name]" />
+            <!-- Date -->
+            <Label fx:id="dateLabel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Date: 01/01/2024" />
+        </HBox>
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <SplitPane dividerPositions="0.3" orientation="HORIZONTAL">
+            <!-- Dashboard (Left Pane) -->
+            <AnchorPane style="-fx-background-color: #B0D5F1;">
+                <VBox alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
+                    <!-- User Info -->
+                    <VBox alignment="CENTER" spacing="10">
+                        <Label fx:id="userNameLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="Name: John Doe" />
+                        <Label fx:id="rollNumberLabel" style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';" text="Roll No: 123456" />
+                    </VBox>
+                    <!-- Buttons -->
+                    <VBox spacing="10" style="-fx-pref-width: 150;">
+                        <Button fx:id="homeButton" onAction="#showHomePane" styleClass="dashboard-button" text="Home" />
+                        <Button fx:id="notificationsButton" onAction="#showNotificationsPane" styleClass="dashboard-button" text="Notifications" />
+                        <Button fx:id="profileButton" onAction="#showProfilePane" styleClass="dashboard-button" text="Profile" />
+                        <Button fx:id="mySocietiesButton" onAction="#showMySocietiesPane" styleClass="dashboard-button" text="My Societies" />
+                        <Button fx:id="applySocietyButton" onAction="#showApplyToSocietyPane" styleClass="dashboard-button" text="Apply to a Society" />
+                        <Button fx:id="makePostButton" onAction="#showMakePostPane" styleClass="dashboard-button" text="Make a Post" />
+                    </VBox>
+                </VBox>
+            </AnchorPane>
+            
+            <!-- Right Pane (Content Area) -->
+            <AnchorPane>
+                <!-- Placeholder for dynamic content panes -->
+                <StackPane fx:id="contentStackPane" layoutX="-14.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
+                    <!-- Example of hidden panes -->
+                    <AnchorPane fx:id="homePane" managed="true" visible="false">
+                        <Label text="Home Content" />
+                    </AnchorPane>
+                    <AnchorPane fx:id="notificationsPane" managed="true" visible="false">
+                        <Label text="Notifications Content" />
+                    </AnchorPane>
+                    <AnchorPane fx:id="profilePane" managed="true" visible="false">
+                        <VBox fx:id="displayInfo" layoutX="208.0" layoutY="80.0" spacing="10" style="-fx-padding: 20;">
+                            <Label fx:id="profileUsernameLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="Username: JohnDoe" />
+                            <Label fx:id="profileNameLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="Name: John Doe" />
+                            <Label fx:id="profileEmailLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Email: johndoe@example.com" />
+                            <Label fx:id="profileRollNumberLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Roll No: 123456" />
+                            <Label fx:id="profileBatchLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Batch: 2024" />
+                            <Label fx:id="profilePhoneLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Phone: 123-456-7890" />
+                        </VBox>
+                        <!-- Edit Button -->
+                        <Button fx:id="editButton" layoutX="336.0" layoutY="294.0" onAction="#enableEditForm" style="-fx-padding: 10; -fx-font-size: 14px;" text="Edit" />
+                        <!-- Edit Form (Invisible by Default) -->
+                        <VBox fx:id="editForm" layoutX="208.0" layoutY="61.0" prefHeight="239.0" prefWidth="345.0" spacing="10" style="-fx-padding: 20;" visible="false">
+                            <TextField fx:id="editUsernameField" promptText="Username" />
+                            <TextField fx:id="editNameField" promptText="Name" />
+                            <TextField fx:id="editEmailField" promptText="Email" />
+                            <TextField fx:id="editPhoneField" promptText="Phone" />
+                            <TextField fx:id="editBatchField" editable="false" promptText="Batch" />
+                            <TextField fx:id="editRollNumberField" editable="false" promptText="Roll No" />
+                        </VBox>
+                        <!-- Save Button (Visible Only When Editing) -->
+                        <Button fx:id="saveButton" layoutX="333.0" layoutY="313.0" onAction="#saveProfileChanges" style="-fx-padding: 10; -fx-font-size: 14px;" text="Save" visible="false" />
+                    </AnchorPane>
+                    <AnchorPane fx:id="mysocietiesPane" managed="true" visible="false" />
+                    <AnchorPane fx:id="applysocietyPane" managed="true" stylesheets="@studentview-styles.css" visible="false">
+                        <GridPane hgap="15.0" layoutX="189.0" layoutY="98.0" style="-fx-background-color: #f4f4f4; -fx-border-color: #4A90E2; -fx-border-width: 2; -fx-padding: 20; -fx-background-radius: 8; -fx-alignment: center;" vgap="10.0">
+                            
+                            <!-- Row 1: Society Name -->
+                            <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Society Name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="societyNameField" promptText="Enter Society Name" style="-fx-font-size: 14px; -fx-padding: 5;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                            <!-- Row 2: Role Applying For -->
+                            <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Role Applying For" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <TextField fx:id="roleField" promptText="Enter Role" style="-fx-font-size: 14px; -fx-padding: 5;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <!-- Row 3: Comments -->
+                            <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Comments" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <TextField fx:id="commentsField" promptText="Enter your comments" style="-fx-font-size: 14px; -fx-padding: 5;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                            <!-- Row 4: Apply Button -->
+                            <Button fx:id="applyButton" onAction="#applyToSociety" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #4A90E2; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;" text="Apply" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                     <columnConstraints>
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                     </rowConstraints>
+                        </GridPane>
+                    </AnchorPane>
+                    <AnchorPane fx:id="makepostPane" managed="true" visible="false">
+                        <!-- Form Title -->
+                        <Label layoutX="20.0" layoutY="29.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';" text="Make a Post" />
+
+                        <!-- Encapsulated Form Box (GridPane) -->
+                        <GridPane hgap="15.0" layoutX="20.0" layoutY="60.0" style="-fx-background-color: #f4f4f4; -fx-border-color: #4A90E2; -fx-border-width: 2; -fx-padding: 20; -fx-background-radius: 8; -fx-alignment: center;" vgap="10.0">
+                            
+                            <!-- Row 1: Post Title -->
+                            <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Post Title" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <TextField fx:id="postTitleField" promptText="Enter Post Title" style="-fx-font-size: 14px; -fx-padding: 5;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                            <!-- Row 2: Post Content -->
+                            <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Post Content" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <TextArea fx:id="postContentArea" prefHeight="150.0" promptText="Enter Post Content" style="-fx-font-size: 14px; -fx-padding: 5;" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                            <!-- Row 3: Post Button -->
+                            <Button fx:id="postButton" onAction="#makePost" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #4A90E2; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;" text="Post" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                     <columnConstraints>
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                     </rowConstraints>
+                        </GridPane>
+                    </AnchorPane>
+                </StackPane>
+            </AnchorPane>
+        </SplitPane>
+    </center>
+</BorderPane>
