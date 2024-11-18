@@ -136,6 +136,10 @@ public class StudentController {
     @FXML
     private Label welcomeLabel;
 
+    // Make an initializer that loads the relevant/necessary information about the currently logged in Student into global variables.
+    // In the displayInfo VBox in profilePane, assign text to the labels based on the data you pulled in the initializer function.
+    // e.g name label would become "Name: Murtaza" etc.
+
     @FXML
     void applyToSociety(ActionEvent event) {
         // Fetch the data that the user inputs in societyNameField, roleField, and commentsField.
