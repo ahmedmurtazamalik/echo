@@ -2,12 +2,10 @@ package app.studentsocietyapp.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -65,6 +63,9 @@ public class StudentController {
     private AnchorPane homePane;
 
     @FXML
+    private Button leavesocietyButton;
+
+    @FXML
     private ImageView logoImage;
 
     @FXML
@@ -75,6 +76,24 @@ public class StudentController {
 
     @FXML
     private Button mySocietiesButton;
+
+    @FXML
+    private TableView<?> mySocietiesTable;
+
+    @FXML
+    private TableView<?> notificationsTable;
+
+    @FXML
+    private TableColumn<?,?> societynameColumn;
+
+    @FXML
+    private TableColumn<?,?> roleColumn;
+
+    @FXML
+    private TableColumn<?,?> dateColumn;
+
+    @FXML
+    private TableColumn<?,?> descriptionColumn;
 
     @FXML
     private AnchorPane mysocietiesPane;
@@ -131,13 +150,30 @@ public class StudentController {
     private TextField societyNameField;
 
     @FXML
+    private ComboBox<?> societylistComboBox;
+
+    @FXML
     private Label userNameLabel;
 
     @FXML
     private Label welcomeLabel;
 
+    @FXML
+    private HBox leavesocietyBox;
+
+    @FXML
+    private HBox relinquishroleBox;
+
+    @FXML
+    private Button rolerelinquishYes;
+
+    @FXML
+    private Button rolerelinquishNo;
+
+
     // Make an initializer that loads the relevant/necessary information about the currently logged in Student into global variables.
     // In the displayInfo VBox in profilePane, assign text to the labels based on the data you pulled in the initializer function.
+    // In the initializer function, you will also load the list of societies the student is currently a member of into the mySocietiesTable
     // e.g name label would become "Name: Murtaza" etc.
 
     @FXML
@@ -194,6 +230,28 @@ public class StudentController {
     @FXML
     void showProfilePane(ActionEvent event) {
         // Make the profilePane visible, and the other 5 invisible.
+    }
+
+    @FXML
+    void leaveaSociety(ActionEvent event) {
+        // Fetch the name of the society the user selected from the societyListComboBox.
+        // Check if the student's role in that society is higher than a member (we only have "member" "head" "secretary" "vp" "president" as roles so basically anything other than member).
+        // If not higher than a member, handle logic for successful removal of the student from the selected society, and refresh the data in mySocietiesTable and societyListComboBox.
+        // If higher, Make leaveSocietyBox invisible, and make relinquishRoleBox visible.
+    }
+
+    @FXML
+    void acceptSocietyLeave(ActionEvent event) {
+        // Handle logic for now successful removal of the student from the selected society.
+        // Refresh the data in mySocietiesTable and societyListComboBox.
+        // Send an alert saying leave successful if need be.
+        // Make leaveSocietyBox visible, and relinquishRoleBox invisible.
+    }
+
+    @FXML
+    void rejectSocietyLeave(ActionEvent event) {
+        // Send an alert saying leave unsuccessful or rejected or something.
+        // Make leaveSocietyBox visible, and relinquishRoleBox invisible.
     }
 
 }

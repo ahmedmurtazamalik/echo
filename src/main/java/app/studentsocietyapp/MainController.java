@@ -52,7 +52,7 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
             // Optionally, display an error message to the user
-            System.out.println("Failed to load student-view.fxml");
+            System.out.println("Failed to load society-view.fxml");
         }
 
     }
