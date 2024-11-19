@@ -1,15 +1,20 @@
 package app.studentsocietyapp.controller;
 
+import app.studentsocietyapp.model.Account;
+import app.studentsocietyapp.model.Student;
+import app.studentsocietyapp.persistence.SQLHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.sql.SQLException;
 
 public class StudentController {
 
@@ -136,60 +141,142 @@ public class StudentController {
     @FXML
     private Label welcomeLabel;
 
+    // Setter for SQLHandler
+    private SQLHandler sqlHandler;
+    public void setSqlHandler() {
+        this.sqlHandler = SQLHandler.getInstance();
+    }
+
+    // Setter for Student details
+    private Student student;
+    public void setStudentDetails(Student student) throws SQLException {
+        this.student = student;
+        updateProfileLabels();
+    }
+
+    // The initialization method will load the student information into the profile labels.
+    @FXML
+    public void initialize() throws SQLException {
+        this.setSqlHandler();
+    }
+
+    private void updateProfileLabels() throws SQLException {
+        if (student != null) {
+            // Populate the profile information with the student's data.
+            profileNameLabel.setText("Name: " + student.getName());
+            System.out.println("Student Batch: " + student.getBatch());
+            profileEmailLabel.setText("Email: " + student.getEmail());
+            profileBatchLabel.setText("Batch: " + student.getBatch());
+            profileRollNumberLabel.setText("Roll Number: " + student.getRollNumber());
+            profilePhoneLabel.setText("Phone: " + student.getPhone());
+            Account account = sqlHandler.getAccountDetails(student.getAccountId());
+            if(account != null) {
+                profileUsernameLabel.setText("Username: " + account.getUsername());
+                userNameLabel.setText(student.getName());
+                welcomeLabel.setText("Welcome, " + student.getName());
+                dateLabel.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            }
+        }
+    }
+
     @FXML
     void applyToSociety(ActionEvent event) {
-        // Fetch the data that the user inputs in societyNameField, roleField, and commentsField.
-        // Make a new entry in SocietyMember table with isApproved bit 0 for now.
-        // An attribute for commentsField in the DB may or may not be added. Up to you. I'll remove the commentsField if you decide against it.
-        // Send alerts (message) in case of successful/failed applications.
+        // This function is not implemented yet, but it would fetch the data that the user inputs
+        // in societyNameField, roleField, and commentsField, and make a new entry in the SocietyMember table.
     }
 
     @FXML
     void enableEditForm(ActionEvent event) {
-        // Inside the profilePane, make the displayInfo VBox and the editButton button invisible.
-        // In turn, make the editForm VBox visible and the saveButton button visible.
+        // Hide the displayInfo VBox and the editButton button.
+        displayInfo.setVisible(false);
+        editButton.setVisible(false);
+
+        // Show the editForm VBox and the saveButton button.
+        editForm.setVisible(true);
+        saveButton.setVisible(true);
     }
 
     @FXML
     void makePost(ActionEvent event) {
-        // Fetch the data that the user inputs in postTitleField and postContentField.
-        // Make a new entry in Post table in DB with the relevant data.
-        // Send alerts (message) in case of successful/failed posts.
+        // This function is not implemented yet, but it would fetch the data that the user inputs
+        // in postTitleField and postContentArea, and create a new post in the Post table.
     }
 
     @FXML
     void saveProfileChanges(ActionEvent event) {
         // Do the opposite actions of what you did for enableEditForm() function.
+        // Hide the editForm VBox and saveButton button.
+        editForm.setVisible(false);
+        saveButton.setVisible(false);
+
+        // Show the displayInfo VBox and editButton button.
+        displayInfo.setVisible(true);
+        editButton.setVisible(true);
     }
 
     @FXML
     void showApplyToSocietyPane(ActionEvent event) {
-        // Make the applysocietyPane visible, and all these panes invisible: homePane, notificationsPane, profilePane, mySocietiesPane, makepostPane.
+        // Make the applysocietyPane visible, and all other panes invisible.
+        applysocietyPane.setVisible(true);
+        homePane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
     }
 
     @FXML
     void showHomePane(ActionEvent event) {
-        // Make the homePane visible, and the other 5 invisible.
+        // Make the homePane visible, and all other panes invisible.
+        homePane.setVisible(true);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
     }
 
     @FXML
     void showMakePostPane(ActionEvent event) {
-        // Make the makepostPane visible, and the other 5 invisible.
+        // Make the makepostPane visible, and all other panes invisible.
+        makepostPane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
     }
 
     @FXML
     void showMySocietiesPane(ActionEvent event) {
-        // Make the mysocietiesPane visible, and the other 5 invisible.
+        // Make the mysocietiesPane visible, and all other panes invisible.
+        mysocietiesPane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        makepostPane.setVisible(false);
     }
 
     @FXML
     void showNotificationsPane(ActionEvent event) {
-        // Make the notificationsPane visible, and the other 5 invisible.
+        // Make the notificationsPane visible, and all other panes invisible.
+        notificationsPane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
     }
 
     @FXML
     void showProfilePane(ActionEvent event) {
-        // Make the profilePane visible, and the other 5 invisible.
+        // Make the profilePane visible, and all other panes invisible.
+        profilePane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
     }
-
 }

@@ -1,8 +1,10 @@
 module app.studentsocietyapp {
         requires javafx.controls;
         requires javafx.fxml;
+    requires java.sql;
+    requires mysql.connector.j;
 
-        exports app.studentsocietyapp;
+    exports app.studentsocietyapp;
 
         opens app.studentsocietyapp to
         javafx.fxml;
