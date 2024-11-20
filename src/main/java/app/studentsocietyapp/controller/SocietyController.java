@@ -6,16 +6,12 @@ import app.studentsocietyapp.model.Student;
 import app.studentsocietyapp.persistence.SQLHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 import java.sql.SQLException;
 
@@ -147,6 +143,90 @@ public class SocietyController {
     @FXML
     private Label welcomeLabel;
 
+    @FXML
+    private TableView<?> societyMembersTable;
+
+    @FXML
+    private TableColumn<?,?> memberNameColumn;
+
+    @FXML
+    private TableColumn<?,?> memberRoleColumn;
+
+    @FXML
+    private HBox removeMemberBox;
+
+    @FXML
+    private ComboBox removeMemberComboBox;
+
+    @FXML
+    private Button removeMemberButton;
+
+    @FXML
+    private Button manageRolesButton;
+
+    @FXML
+    private AnchorPane manageRolesPane;
+
+    @FXML
+    private TableView<?> membersListTable;
+
+    @FXML
+    private TableColumn<?,?> memberNameColumn1;
+
+    @FXML
+    private TableColumn<?,?> memberRoleColumn1;
+
+    @FXML
+    private HBox changeRoleBox;
+
+    @FXML
+    private ComboBox selectMemberComboBox;
+
+    @FXML
+    private ComboBox selectRoleComboBox;
+
+    @FXML
+    private Button roleChangeConfirmButton;
+
+    @FXML
+    private VBox organizeEventForm;
+
+    @FXML
+    private TextField eventNameField;
+
+    @FXML
+    private DatePicker eventDatePicker;
+
+    @FXML
+    private TextField eventDateField;
+
+    @FXML
+    private TextField eventStartTimeField;
+
+    @FXML
+    private TextField eventEndTimeField;
+
+    @FXML
+    private TextArea eventDescriptionArea;
+
+    @FXML
+    private ComboBox eventVenueComboBox;
+
+    @FXML
+    private Button submitEventButton;
+
+    @FXML
+    private TableColumn<?,?> approvalStatusColumn;
+
+    @FXML
+    private HBox approveMemberBox;
+
+    @FXML
+    private ComboBox approveMemberComboBox;
+
+    @FXML
+    private Button approveMemberButton;
+
     private SQLHandler sqlHandler;
     private Society society;
 
@@ -204,6 +284,47 @@ public class SocietyController {
     void saveProfileChanges(ActionEvent event) {
         // Edit the DB entry to save the changes in profile according to entered data in the fields.
         // Do the opposite visibility/invisibility actions of what you did for enableEditForm() function.
+        // Only e-mail and description are editable.
+    }
+
+    @FXML
+    void removeMember (ActionEvent event) {
+        // Fetch the society member selected in removeMemberComboBox.
+        // In case of any role except VP or President, removal will be successful. If it's a VP or Pres, Either (a) Send alert saying can't remove VP / President if selected member is VP or President, or (b) Just filter out the VP and President and don't load/display them in the ComboBox in the first place.
+        // Do appropriate action to remove that student as a member of that soceity. I
+    }
+
+    @FXML
+    void updateRole (ActionEvent event) {
+        // Fetch the student selected in selectMemberComboBox.
+        // Fetch the role selected in selectRoleComboBox.
+        // Update the role of that student.
+        // Only secretaries, heads, and members are replaceable. VP and President are not replaceable. (I think)
+    }
+
+    @FXML
+    void organizeEvent (ActionEvent event) {
+        // Fetch the data from eventNameField, eventDatePicker, eventStartTimeField, eventEndTimeField, eventDescriptionArea.
+        // Make relevant entry in Event table.
+    }
+
+    @FXML
+    void approveStudent (ActionEvent event) {
+        // You will have loaded the pending members only into the approveMemberComboBox in initializer.
+        // Fetch selected student from approveMemberComboBox.
+        // Do appropriate action to add that student as a member of that society.
+    }
+
+    @FXML
+    void showManageRolesPane(ActionEvent event) {
+        manageRolesPane.setVisible(true); // Make the manageRolesPane visible
+        homePane.setVisible(false);  // Make the homePane visible
+        notificationsPane.setVisible(false);  // Make the notificationsPane invisible
+        profilePane.setVisible(false);  // Make the profilePane invisible
+        organizeEventPane.setVisible(false);  // Make the organizeEventPane invisible
+        manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
+        makepostPane.setVisible(false);  // Make the makepostPane invisible
+        makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
     }
 
     @FXML
@@ -215,6 +336,7 @@ public class SocietyController {
         manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
         makepostPane.setVisible(false);  // Make the makepostPane invisible
         makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
+        manageRolesPane.setVisible(false); // Make the manageRolesPane invisible
     }
 
     @FXML
@@ -226,6 +348,7 @@ public class SocietyController {
         manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
         makepostPane.setVisible(false);  // Make the makepostPane invisible
         makeAnnouncementPane.setVisible(true);  // Make the makeAnnouncementPane visible
+        manageRolesPane.setVisible(false); // Make the manageRolesPane invisible
     }
 
     @FXML
@@ -237,6 +360,7 @@ public class SocietyController {
         manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
         makepostPane.setVisible(true);  // Make the makepostPane visible
         makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
+        manageRolesPane.setVisible(false); // Make the manageRolesPane invisible
     }
 
     @FXML
@@ -248,6 +372,7 @@ public class SocietyController {
         manageMembersPane.setVisible(true);  // Make the manageMembersPane visible
         makepostPane.setVisible(false);  // Make the makepostPane invisible
         makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
+        manageRolesPane.setVisible(false); // Make the manageRolesPane invisible
     }
 
     @FXML
@@ -259,6 +384,7 @@ public class SocietyController {
         manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
         makepostPane.setVisible(false);  // Make the makepostPane invisible
         makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
+        manageRolesPane.setVisible(false); // Make the manageRolesPane invisible
     }
 
     @FXML
@@ -270,6 +396,7 @@ public class SocietyController {
         manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
         makepostPane.setVisible(false);  // Make the makepostPane invisible
         makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
+        manageRolesPane.setVisible(false); // Make the manageRolesPane invisible
     }
 
     @FXML
@@ -281,6 +408,7 @@ public class SocietyController {
         manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
         makepostPane.setVisible(false);  // Make the makepostPane invisible
         makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
+        manageRolesPane.setVisible(false); // Make the manageRolesPane invisible
     }
 
 }
