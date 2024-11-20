@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefWidth="800" stylesheets="@societyview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.studentsocietyapp.controller.SocietyController">
+   <top>
+      <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #4A90E2; -fx-padding: 10;">
+         <children>
+            <ImageView fx:id="logoImage" fitHeight="40" fitWidth="40">
+               <image>
+                  <Image url="@logo.png" />
+               </image>
+            </ImageView>
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="FAST NU ECHO" />
+            <HBox HBox.hgrow="ALWAYS" />
+            <Label fx:id="welcomeLabel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Welcome, [User Name]" />
+            <Label fx:id="dateLabel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Date: 01/01/2024" />
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <SplitPane dividerPositions="0.3" orientation="HORIZONTAL">
+         <items>
+            <AnchorPane style="-fx-background-color: #B0D5F1;">
+               <children>
+                  <VBox alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;" stylesheets="@societyview-styles.css">
+                     <children>
+                        <VBox alignment="CENTER" spacing="10">
+                           <children>
+                              <Label fx:id="societyNameLabel" prefHeight="38.0" prefWidth="107.0" style="-fx-font-size: 16px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="Society Name">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font></Label>
+                           </children>
+                        </VBox>
+                        <VBox spacing="10" style="-fx-pref-width: 150;">
+                           <children>
+                              <Button fx:id="homeButton" onAction="#showHomePane" styleClass="dashboard-button" text="Home" />
+                              <Button fx:id="notificationsButton" onAction="#showNotificationsPane" styleClass="dashboard-button" text="Notifications" />
+                              <Button fx:id="profileButton" onAction="#showProfilePane" styleClass="dashboard-button" text="Profile" />
+                              <Button fx:id="organizeEventButton" onAction="#showOrganizeEventPane" styleClass="dashboard-button" text="Organize an Event" />
+                              <Button fx:id="manageMembersButton" onAction="#showManageMembersPane" styleClass="dashboard-button" text="Manage Members" />
+                              <Button fx:id="makePostButton" onAction="#showMakePostPane" styleClass="dashboard-button" text="Make a Post" />
+                              <Button fx:id="makeAnnouncementButton" onAction="#showMakeAnnouncementPane" prefWidth="156.0" style="-fx-font-size: 13px;" styleClass="dashboard-button" text="Make Announcement" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+            <AnchorPane>
+               <children>
+                  <StackPane fx:id="contentStackPane" layoutX="-14.0" prefWidth="741.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <AnchorPane fx:id="homePane" managed="true" prefHeight="483.0" prefWidth="710.0" visible="false">
+                           <children>
+                              <Label text="Home Content" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="notificationsPane" managed="true" prefHeight="483.0" prefWidth="758.0" visible="false">
+                           <children>
+                              <VBox layoutX="14.0" layoutY="1.0" prefHeight="481.0" prefWidth="726.0" style="-fx-background-color: #E6F2FF; -fx-padding: 20;">
+                                 <children>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="671.0">
+                                       <children>
+                                          <Label prefHeight="34.0" prefWidth="149.0" style="-fx-font-family: 'Segoe UI';" text="Notifications">
+                                             <font>
+                                                <Font name="Segoe UI Bold" size="24.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="notificationsTable" editable="true" prefHeight="200.0" prefWidth="657.0">
+                                       <columns>
+                                          <TableColumn fx:id="dateColumn" prefWidth="117.60002136230469" text="Date" />
+                                          <TableColumn fx:id="descriptionColumn" minWidth="0.0" prefWidth="607.9999389648438" text="Description" />
+                                       </columns>
+                                    </TableView>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="profilePane" managed="true" visible="false">
+                           <children>
+                              <VBox fx:id="displayInfo" alignment="CENTER" layoutX="208.0" layoutY="121.0" nodeOrientation="LEFT_TO_RIGHT" spacing="10" style="-fx-padding: 20;">
+                                 <children>
+                                    <Label fx:id="profileUsernameLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="Society Username: JohnDoe" />
+                                    <Label fx:id="profileNameLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;" text="Society Name: John Doe" />
+                                    <Label fx:id="profileEmailLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Society Email: johndoe@example.com" />
+                                    <Label fx:id="profileMemberCountLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Total Members:" />
+                                    <Label fx:id="profileApprovalLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Approval Status:" />
+                                    <Label fx:id="profileDescriptionLabel" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Society Description:" />
+                                 </children>
+                              </VBox>
+                              <Button fx:id="editButton" layoutX="336.0" layoutY="344.0" onAction="#enableEditForm" style="-fx-padding: 10; -fx-font-size: 14px;" text="Edit" />
+                              <VBox fx:id="editForm" layoutX="221.0" layoutY="43.0" prefHeight="358.0" prefWidth="370.0" spacing="10" style="-fx-padding: 20;" visible="false">
+                                 <children>
+                                    <TextField fx:id="editUsernameField" promptText="Username" />
+                                    <TextField fx:id="editEmailField" promptText="Email" />
+                                    <TextField fx:id="editMembersField" promptText="Members" />
+                                    <TextArea fx:id="editDescriptionField" prefHeight="200.0" prefWidth="200.0" promptText="Description" />
+                                 </children>
+                              </VBox>
+                              <Button fx:id="saveButton" layoutX="346.0" layoutY="413.0" onAction="#saveProfileChanges" style="-fx-padding: 10; -fx-font-size: 14px;" text="Save" visible="false" />
+                              <Label layoutX="319.0" layoutY="80.0" prefHeight="30.0" prefWidth="78.0" style="-fx-font-size: 24;" text="Profile">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="organizeEventPane" managed="true" visible="false" />
+                        <AnchorPane fx:id="manageMembersPane" managed="true" stylesheets="@societyview-styles.css" visible="false" />
+                        <AnchorPane fx:id="makepostPane" managed="true" visible="false">
+                           <children>
+                              <Label layoutX="301.0" layoutY="59.0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';" text="Make a Post" />
+                              <GridPane hgap="15.0" layoutX="22.0" layoutY="98.0" style="-fx-background-color: #f4f4f4; -fx-border-color: #4A90E2; -fx-border-width: 2; -fx-padding: 20; -fx-background-radius: 8; -fx-alignment: center;" vgap="10.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Post Title" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <TextField fx:id="postTitleField" promptText="Enter Post Title" style="-fx-font-size: 14px; -fx-padding: 5;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Post Content" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <TextArea fx:id="postContentArea" prefHeight="150.0" promptText="Enter Post Content" style="-fx-font-size: 14px; -fx-padding: 5;" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Button fx:id="postButton" onAction="#makePost" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #4A90E2; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;" text="Post" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane fx:id="makeAnnouncementPane" managed="true" visible="false">
+                           <children>
+                              <Label layoutX="233.0" layoutY="57.0" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';" text="Make an Announcement" />
+                              <GridPane hgap="15.0" layoutX="38.0" layoutY="98.0" style="-fx-background-color: #f4f4f4; -fx-border-color: #4A90E2; -fx-border-width: 2; -fx-padding: 20; -fx-background-radius: 8; -fx-alignment: center;" vgap="10.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                    <RowConstraints />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label alignment="CENTER" style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Title" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <TextField fx:id="announcementTitleField" promptText="Enter Announcement Title" style="-fx-font-size: 14px; -fx-padding: 5;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    <Label style="-fx-font-size: 14px; -fx-font-family: 'Segoe UI';" text="Content" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <TextArea fx:id="announcementContentArea" prefHeight="150.0" promptText="Enter Announcement Content" style="-fx-font-size: 14px; -fx-padding: 5;" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Button fx:id="announceButton" onAction="#makeAnnouncement" prefHeight="39.0" prefWidth="87.0" style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-color: #4A90E2; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;" text="Announce" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </StackPane>
+               </children>
+            </AnchorPane>
+         </items>
+      </SplitPane>
+   </center>
+</BorderPane>

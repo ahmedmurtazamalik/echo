@@ -1,5 +1,9 @@
 package app.studentsocietyapp.controller;
 
+import app.studentsocietyapp.model.Account;
+import app.studentsocietyapp.model.Society;
+import app.studentsocietyapp.model.Student;
+import app.studentsocietyapp.persistence.SQLHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -12,6 +16,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import java.sql.SQLException;
 
 public class SocietyController {
 
@@ -141,6 +147,39 @@ public class SocietyController {
     @FXML
     private Label welcomeLabel;
 
+    private SQLHandler sqlHandler;
+    private Society society;
+
+    @FXML
+    public void initialize() throws SQLException {
+        this.setSqlHandler();
+    }
+
+    private void setSqlHandler() {
+        this.sqlHandler = SQLHandler.getInstance();
+    }
+
+    public void setSocietyDetails(Society society) throws SQLException {
+        this.society = society;
+        updateProfileLabels();
+    }
+
+    private void updateProfileLabels() throws SQLException {
+        if (society != null) {
+            profileNameLabel.setText("Name: " + society.getName());
+            profileEmailLabel.setText("Email: " + society.getEmail());
+            profileDescriptionLabel.setText("Description: " + society.getDescription());
+
+
+            Account account = sqlHandler.getAccountDetails(society.getAccountId());
+            if (account != null) {
+                System.out.println("Account found");
+                profileUsernameLabel.setText("Username: " + account.getUsername());
+                welcomeLabel.setText(society.getName());
+            }
+        }
+    }
+
     @FXML
     void enableEditForm(ActionEvent event) {
         // Inside the profilePane, make the displayInfo VBox and the editButton button invisible.
@@ -169,41 +208,79 @@ public class SocietyController {
 
     @FXML
     void showHomePane(ActionEvent event) {
-        // Make the homePane visible, and these 6 invisible: notificationsPane, profilePane, organizeEventPane, manageMembersPane, makepostPane, makeAnnouncementPane.
+        homePane.setVisible(true);  // Make the homePane visible
+        notificationsPane.setVisible(false);  // Make the notificationsPane invisible
+        profilePane.setVisible(false);  // Make the profilePane invisible
+        organizeEventPane.setVisible(false);  // Make the organizeEventPane invisible
+        manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
+        makepostPane.setVisible(false);  // Make the makepostPane invisible
+        makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
     }
 
     @FXML
     void showMakeAnnouncementPane(ActionEvent event) {
-        // Make the announcementPane visible, and the other 6 invisible.
+        homePane.setVisible(false);  // Make the homePane invisible
+        notificationsPane.setVisible(false);  // Make the notificationsPane invisible
+        profilePane.setVisible(false);  // Make the profilePane invisible
+        organizeEventPane.setVisible(false);  // Make the organizeEventPane invisible
+        manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
+        makepostPane.setVisible(false);  // Make the makepostPane invisible
+        makeAnnouncementPane.setVisible(true);  // Make the makeAnnouncementPane visible
     }
 
     @FXML
     void showMakePostPane(ActionEvent event) {
-        // Make the makepostPane visible, and the other 6 invisible.
+        homePane.setVisible(false);  // Make the homePane invisible
+        notificationsPane.setVisible(false);  // Make the notificationsPane invisible
+        profilePane.setVisible(false);  // Make the profilePane invisible
+        organizeEventPane.setVisible(false);  // Make the organizeEventPane invisible
+        manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
+        makepostPane.setVisible(true);  // Make the makepostPane visible
+        makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
     }
 
     @FXML
     void showManageMembersPane(ActionEvent event) {
-        // Make the manageMembersPane visible, and the other 6 invisible.
-
+        homePane.setVisible(false);  // Make the homePane invisible
+        notificationsPane.setVisible(false);  // Make the notificationsPane invisible
+        profilePane.setVisible(false);  // Make the profilePane invisible
+        organizeEventPane.setVisible(false);  // Make the organizeEventPane invisible
+        manageMembersPane.setVisible(true);  // Make the manageMembersPane visible
+        makepostPane.setVisible(false);  // Make the makepostPane invisible
+        makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
     }
 
     @FXML
     void showNotificationsPane(ActionEvent event) {
-        // Make the notificationsPane visible, and the other 6 invisible.
-
+        homePane.setVisible(false);  // Make the homePane invisible
+        notificationsPane.setVisible(true);  // Make the notificationsPane visible
+        profilePane.setVisible(false);  // Make the profilePane invisible
+        organizeEventPane.setVisible(false);  // Make the organizeEventPane invisible
+        manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
+        makepostPane.setVisible(false);  // Make the makepostPane invisible
+        makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
     }
 
     @FXML
     void showOrganizeEventPane(ActionEvent event) {
-        // Make the organizeEventPane visible, and the other 6 invisible.
-
+        homePane.setVisible(false);  // Make the homePane invisible
+        notificationsPane.setVisible(false);  // Make the notificationsPane invisible
+        profilePane.setVisible(false);  // Make the profilePane invisible
+        organizeEventPane.setVisible(true);  // Make the organizeEventPane visible
+        manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
+        makepostPane.setVisible(false);  // Make the makepostPane invisible
+        makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
     }
 
     @FXML
     void showProfilePane(ActionEvent event) {
-        // Make the profilePane visible, and the other 6 invisible.
-
+        homePane.setVisible(false);  // Make the homePane invisible
+        notificationsPane.setVisible(false);  // Make the notificationsPane invisible
+        profilePane.setVisible(true);  // Make the profilePane visible
+        organizeEventPane.setVisible(false);  // Make the organizeEventPane invisible
+        manageMembersPane.setVisible(false);  // Make the manageMembersPane invisible
+        makepostPane.setVisible(false);  // Make the makepostPane invisible
+        makeAnnouncementPane.setVisible(false);  // Make the makeAnnouncementPane invisible
     }
 
 }

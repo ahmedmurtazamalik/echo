@@ -1,13 +1,23 @@
 package app.studentsocietyapp.controller;
 
+import app.studentsocietyapp.model.*;
+import app.studentsocietyapp.persistence.SQLHandler;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class StudentController {
 
@@ -78,7 +88,7 @@ public class StudentController {
     private Button mySocietiesButton;
 
     @FXML
-    private TableView<?> mySocietiesTable;
+    private TableView<SocietyRole> mySocietiesTable;
 
     @FXML
     private TableView<?> notificationsTable;
@@ -150,7 +160,7 @@ public class StudentController {
     private TextField societyNameField;
 
     @FXML
-    private ComboBox<?> societylistComboBox;
+    private ComboBox<String> societylistComboBox;
 
     @FXML
     private Label userNameLabel;
@@ -170,88 +180,240 @@ public class StudentController {
     @FXML
     private Button rolerelinquishNo;
 
+    private SQLHandler sqlHandler;
+    private Student student;
 
-    // Make an initializer that loads the relevant/necessary information about the currently logged in Student into global variables.
-    // In the displayInfo VBox in profilePane, assign text to the labels based on the data you pulled in the initializer function.
-    // In the initializer function, you will also load the list of societies the student is currently a member of into the mySocietiesTable
-    // e.g name label would become "Name: Murtaza" etc.
-
+    // Initialize method
     @FXML
-    void applyToSociety(ActionEvent event) {
-        // Fetch the data that the user inputs in societyNameField, roleField, and commentsField.
-        // Make a new entry in SocietyMember table with isApproved bit 0 for now.
-        // An attribute for commentsField in the DB may or may not be added. Up to you. I'll remove the commentsField if you decide against it.
-        // Send alerts (message) in case of successful/failed applications.
+    public void initialize() throws SQLException {
+        this.setSqlHandler();
+    }
+
+    private void setSqlHandler() {
+        this.sqlHandler = SQLHandler.getInstance();
+    }
+
+    public void setStudentDetails(Student student) throws SQLException {
+        this.student = student;
+        updateProfileLabels();
+        loadMySocieties();
+    }
+
+    private void updateProfileLabels() throws SQLException {
+        if (student != null) {
+            profileNameLabel.setText("Name: " + student.getName());
+            profileEmailLabel.setText("Email: " + student.getEmail());
+            profileBatchLabel.setText("Batch: " + student.getBatch());
+            profileRollNumberLabel.setText("Roll Number: " + student.getRollNumber());
+            profilePhoneLabel.setText("Phone: " + student.getPhone());
+
+            Account account = sqlHandler.getAccountDetails(student.getAccountId());
+            if (account != null) {
+                profileUsernameLabel.setText("Username: " + account.getUsername());
+                userNameLabel.setText(student.getName());
+                welcomeLabel.setText("Welcome, " + student.getName());
+            }
+        }
+    }
+
+    private void loadMySocieties() throws SQLException {
+        mySocietiesTable.getItems().clear();
+        societylistComboBox.getItems().clear();
+
+        // Fetch the list of SocietyRole objects for the given student
+        ArrayList<SocietyRole> societyRoles = sqlHandler.getStudentSocietyRoles(student.getStudentId());
+
+        // Assuming you have columns for society name and role in your TableView
+        TableColumn<SocietyRole, String> societyNameColumn = new TableColumn<>("Society Name");
+        societyNameColumn.setCellValueFactory(new PropertyValueFactory<>("societyName")); // Binding to societyName in SocietyRole
+
+        TableColumn<SocietyRole, String> roleColumn = new TableColumn<>("Role");
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role")); // Binding to role in SocietyRole
+
+        mySocietiesTable.getColumns().setAll(societyNameColumn, roleColumn);
+        mySocietiesTable.getItems().addAll(societyRoles);
+
+        // Iterate over the SocietyRole list
+        for (SocietyRole societyRole : societyRoles) {
+            // Fetch the Society object using the name from the SocietyRole
+            Society society = sqlHandler.getSocietyByName(societyRole.getSocietyName());
+            // Add the Society object to the ComboBox (if needed)
+            if (society != null) {
+                societylistComboBox.getItems().add(society.getName());
+            }
+        }
     }
 
     @FXML
     void enableEditForm(ActionEvent event) {
-        // Inside the profilePane, make the displayInfo VBox and the editButton button invisible.
-        // In turn, make the editForm VBox visible and the saveButton button visible.
+        displayInfo.setVisible(false);
+        editButton.setVisible(false);
+        editForm.setVisible(true);
+        saveButton.setVisible(true);
+
+        // Pre-fill edit form with current profile values
+        editNameField.setText(student.getName());
+        editEmailField.setText(student.getEmail());
+        editBatchField.setText(student.getBatch());
+        editRollNumberField.setText(student.getRollNumber());
+        editPhoneField.setText(student.getPhone());
     }
 
     @FXML
-    void makePost(ActionEvent event) {
-        // Fetch the data that the user inputs in postTitleField and postContentField.
-        // Make a new entry in Post table in DB with the relevant data.
-        // Send alerts (message) in case of successful/failed posts.
+    void saveProfileChanges(ActionEvent event) throws SQLException {
+        // Update student object with new values
+        student.setName(editNameField.getText());
+        student.setEmail(editEmailField.getText());
+        student.setBatch(editBatchField.getText());
+        student.setRollNumber(editRollNumberField.getText());
+        student.setPhone(editPhoneField.getText());
+
+        // Update database
+        try {
+            sqlHandler.updateStudentDetails(student);
+        }
+        catch (SQLException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Invalid Entry");
+        }
+        // Hide edit form, show profile view
+        editForm.setVisible(false);
+        saveButton.setVisible(false);
+        displayInfo.setVisible(true);
+        editButton.setVisible(true);
+
+        updateProfileLabels();
     }
 
     @FXML
-    void saveProfileChanges(ActionEvent event) {
-        // Do the opposite actions of what you did for enableEditForm() function.
+    void applyToSociety(ActionEvent event) throws SQLException {
+        String societyName = societyNameField.getText();
+        String role = roleField.getText();
+        String comments = commentsField.getText();
+
+        if (!societyName.isEmpty() && !role.isEmpty()) {
+            sqlHandler.applyToSociety(student.getStudentId(), societyName, role, comments);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("Application submitted successfully!");
+            alert.show();
+            societyNameField.clear();
+            roleField.clear();
+            commentsField.clear();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Please fill in all required fields.");
+            alert.show();
+        }
     }
 
+    // Methods for switching panes
     @FXML
-    void showApplyToSocietyPane(ActionEvent event) {
-        // Make the applysocietyPane visible, and all these panes invisible: homePane, notificationsPane, profilePane, mySocietiesPane, makepostPane.
-    }
-
-    @FXML
-    void showHomePane(ActionEvent event) {
-        // Make the homePane visible, and the other 5 invisible.
-    }
-
-    @FXML
-    void showMakePostPane(ActionEvent event) {
-        // Make the makepostPane visible, and the other 5 invisible.
+    void showProfilePane(ActionEvent event) {
+        profilePane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
     }
 
     @FXML
     void showMySocietiesPane(ActionEvent event) {
-        // Make the mysocietiesPane visible, and the other 5 invisible.
+        mysocietiesPane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        makepostPane.setVisible(false);
+    }
+
+    @FXML
+    void showApplyToSocietyPane(ActionEvent event) {
+        applysocietyPane.setVisible(true);
+        homePane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
+    }
+
+    @FXML
+    void showHomePane(ActionEvent event) {
+        homePane.setVisible(true);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
+    }
+
+    @FXML
+    void showMakePostPane(ActionEvent event) {
+        makepostPane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        notificationsPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
     }
 
     @FXML
     void showNotificationsPane(ActionEvent event) {
-        // Make the notificationsPane visible, and the other 5 invisible.
+        notificationsPane.setVisible(true);
+        homePane.setVisible(false);
+        applysocietyPane.setVisible(false);
+        profilePane.setVisible(false);
+        mysocietiesPane.setVisible(false);
+        makepostPane.setVisible(false);
     }
 
     @FXML
-    void showProfilePane(ActionEvent event) {
-        // Make the profilePane visible, and the other 5 invisible.
+    void leaveSociety(ActionEvent event) {
+//        String selectedSociety = societylistComboBox.getValue().toString();
+//        if (selectedSociety != null) {
+//            var societyDetails = sqlHandler.getSocietyDetails(selectedSociety);
+//            String role = societyDetails.getRole(student.getStudentId());
+//
+//            if (role.equals("member")) {
+//                sqlHandler.removeFromSociety(student.getStudentId(), selectedSociety);
+//                loadMySocieties();
+//                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//                alert.setContentText("Successfully left the society.");
+//                alert.show();
+//            } else {
+//                leavesocietyBox.setVisible(false);
+//                relinquishroleBox.setVisible(true);
+//            }
+//        }
     }
 
     @FXML
-    void leaveaSociety(ActionEvent event) {
-        // Fetch the name of the society the user selected from the societyListComboBox.
-        // Check if the student's role in that society is higher than a member (we only have "member" "head" "secretary" "vp" "president" as roles so basically anything other than member).
-        // If not higher than a member, handle logic for successful removal of the student from the selected society, and refresh the data in mySocietiesTable and societyListComboBox.
-        // If higher, Make leaveSocietyBox invisible, and make relinquishRoleBox visible.
+    void relinquishRole(ActionEvent event) throws SQLException {
+//        String selectedSociety = societylistComboBox.getValue().toString();
+//        sqlHandler.relinquishRoleInSociety(student.getStudentId(), selectedSociety);
+//        loadMySocieties();
+//        relinquishroleBox.setVisible(false);
+//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//        alert.setContentText("Successfully relinquished role in society.");
+//        alert.show();
     }
 
     @FXML
-    void acceptSocietyLeave(ActionEvent event) {
-        // Handle logic for now successful removal of the student from the selected society.
-        // Refresh the data in mySocietiesTable and societyListComboBox.
-        // Send an alert saying leave successful if need be.
-        // Make leaveSocietyBox visible, and relinquishRoleBox invisible.
+    void cancelRelinquishRole(ActionEvent event) {
+        relinquishroleBox.setVisible(false);
     }
 
-    @FXML
-    void rejectSocietyLeave(ActionEvent event) {
-        // Send an alert saying leave unsuccessful or rejected or something.
-        // Make leaveSocietyBox visible, and relinquishRoleBox invisible.
+    public void makePost(ActionEvent actionEvent) {
     }
 
+    public void acceptSocietyLeave(ActionEvent actionEvent) {
+    }
+
+    public void rejectSocietyLeave(ActionEvent actionEvent) {
+    }
+
+    public void leaveaSociety(ActionEvent actionEvent) {
+    }
 }
