@@ -143,7 +143,7 @@
                            <Region prefHeight="87.0" prefWidth="14.0" />
                            <ComboBox fx:id="societylistComboBox" prefWidth="150.0" />
                            <Region prefHeight="87.0" prefWidth="25.0" />
-                           <Button fx:id="leavesocietyButton" mnemonicParsing="false" onAction="#leaveaSociety" prefHeight="17.0" prefWidth="64.0" style="-fx-background-color: #4A90E2; -fx-font-weight: bold;" text="Leave" />
+                           <Button fx:id="leavesocietyButton" mnemonicParsing="false" onAction="#leaveSociety" prefHeight="17.0" prefWidth="64.0" style="-fx-background-color: #4A90E2; -fx-font-weight: bold;" text="Leave" />
                         </children>
                      </HBox>
                      <HBox fx:id="relinquishroleBox" prefHeight="42.0" prefWidth="674.0" visible="false">

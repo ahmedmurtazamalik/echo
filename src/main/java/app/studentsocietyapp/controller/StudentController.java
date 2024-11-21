@@ -223,14 +223,10 @@ public class StudentController {
         // Fetch the list of SocietyRole objects for the given student
         ArrayList<SocietyRole> societyRoles = sqlHandler.getStudentSocietyRoles(student.getStudentId());
 
-        // Assuming you have columns for society name and role in your TableView
-        TableColumn<SocietyRole, String> societyNameColumn = new TableColumn<>("Society Name");
-        societyNameColumn.setCellValueFactory(new PropertyValueFactory<>("societyName")); // Binding to societyName in SocietyRole
-
-        TableColumn<SocietyRole, String> roleColumn = new TableColumn<>("Role");
+        societynameColumn.setCellValueFactory(new PropertyValueFactory<>("societyName")); // Binding to societyName in SocietyRole
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("role")); // Binding to role in SocietyRole
 
-        mySocietiesTable.getColumns().setAll(societyNameColumn, roleColumn);
+        //mySocietiesTable.getColumns().setAll(societyNameColumn, roleColumn);
         mySocietiesTable.getItems().addAll(societyRoles);
 
         // Iterate over the SocietyRole list
@@ -371,49 +367,45 @@ public class StudentController {
 
     @FXML
     void leaveSociety(ActionEvent event) {
-//        String selectedSociety = societylistComboBox.getValue().toString();
-//        if (selectedSociety != null) {
-//            var societyDetails = sqlHandler.getSocietyDetails(selectedSociety);
-//            String role = societyDetails.getRole(student.getStudentId());
-//
-//            if (role.equals("member")) {
-//                sqlHandler.removeFromSociety(student.getStudentId(), selectedSociety);
-//                loadMySocieties();
-//                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//                alert.setContentText("Successfully left the society.");
-//                alert.show();
-//            } else {
-//                leavesocietyBox.setVisible(false);
-//                relinquishroleBox.setVisible(true);
-//            }
-//        }
+        String selectedSociety = societylistComboBox.getValue();
+        if (selectedSociety != null) {
+            try {
+                Society society = sqlHandler.getSocietyByName(selectedSociety);
+                SocietyRole role = sqlHandler.getStudentSocietyRole(student.getStudentId(), society.getSocietyId());
+
+                if (role.getRole().equals("Member")) {
+                    sqlHandler.removeFromSociety(student.getStudentId(), society.getSocietyId());
+                    loadMySocieties();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("Successfully left the society.");
+                    alert.show();
+                } else {
+                    leavesocietyBox.setVisible(false);
+                    relinquishroleBox.setVisible(true);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
     @FXML
-    void relinquishRole(ActionEvent event) throws SQLException {
-//        String selectedSociety = societylistComboBox.getValue().toString();
-//        sqlHandler.relinquishRoleInSociety(student.getStudentId(), selectedSociety);
-//        loadMySocieties();
-//        relinquishroleBox.setVisible(false);
-//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//        alert.setContentText("Successfully relinquished role in society.");
-//        alert.show();
-    }
-
-    @FXML
-    void cancelRelinquishRole(ActionEvent event) {
+    public void acceptSocietyLeave(ActionEvent actionEvent) throws SQLException {
+        String selectedSociety = societylistComboBox.getValue();
+        Society society = sqlHandler.getSocietyByName(selectedSociety);
+        sqlHandler.relinquishRoleInSociety(student.getStudentId(), society.getSocietyId());
+        loadMySocieties();
         relinquishroleBox.setVisible(false);
+        leavesocietyBox.setVisible(true);
+    }
+
+    @FXML
+    public void rejectSocietyLeave(ActionEvent actionEvent) {
+        relinquishroleBox.setVisible(false);
+        leavesocietyBox.setVisible(true);
     }
 
     public void makePost(ActionEvent actionEvent) {
-    }
-
-    public void acceptSocietyLeave(ActionEvent actionEvent) {
-    }
-
-    public void rejectSocietyLeave(ActionEvent actionEvent) {
-    }
-
-    public void leaveaSociety(ActionEvent actionEvent) {
     }
 }

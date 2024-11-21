@@ -1,12 +1,13 @@
 package app.studentsocietyapp.controller;
 
-import app.studentsocietyapp.model.Account;
-import app.studentsocietyapp.model.Society;
-import app.studentsocietyapp.model.Student;
+import app.studentsocietyapp.model.*;
 import app.studentsocietyapp.persistence.SQLHandler;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -14,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class SocietyController {
 
@@ -52,12 +54,6 @@ public class SocietyController {
 
     @FXML
     private VBox editForm;
-
-    @FXML
-    private TextField editMembersField;
-
-    @FXML
-    private TextField editUsernameField;
 
     @FXML
     private Button homeButton;
@@ -144,7 +140,7 @@ public class SocietyController {
     private Label welcomeLabel;
 
     @FXML
-    private TableView<?> societyMembersTable;
+    private TableView<SocietyMemberRow> societyMembersTable;
 
     @FXML
     private TableColumn<?,?> memberNameColumn;
@@ -156,7 +152,7 @@ public class SocietyController {
     private HBox removeMemberBox;
 
     @FXML
-    private ComboBox removeMemberComboBox;
+    private ComboBox<Student> removeMemberComboBox;
 
     @FXML
     private Button removeMemberButton;
@@ -168,7 +164,7 @@ public class SocietyController {
     private AnchorPane manageRolesPane;
 
     @FXML
-    private TableView<?> membersListTable;
+    private TableView<SocietyMemberRow> membersListTable;
 
     @FXML
     private TableColumn<?,?> memberNameColumn1;
@@ -180,10 +176,10 @@ public class SocietyController {
     private HBox changeRoleBox;
 
     @FXML
-    private ComboBox selectMemberComboBox;
+    private ComboBox<Student> selectMemberComboBox;
 
     @FXML
-    private ComboBox selectRoleComboBox;
+    private ComboBox<String> selectRoleComboBox;
 
     @FXML
     private Button roleChangeConfirmButton;
@@ -222,7 +218,7 @@ public class SocietyController {
     private HBox approveMemberBox;
 
     @FXML
-    private ComboBox approveMemberComboBox;
+    private ComboBox<Student> approveMemberComboBox;
 
     @FXML
     private Button approveMemberButton;
@@ -242,6 +238,15 @@ public class SocietyController {
     public void setSocietyDetails(Society society) throws SQLException {
         this.society = society;
         updateProfileLabels();
+        initializeTables();
+        ArrayList<String> rolesList= new ArrayList<>();
+        //rolesList.add("President");
+        rolesList.add("VP");
+        rolesList.add("Secretary");
+        rolesList.add("Head");
+        rolesList.add("Member");
+        ObservableList<String> observableList = FXCollections.observableList(rolesList);
+        selectRoleComboBox.setItems(observableList);
     }
 
     private void updateProfileLabels() throws SQLException {
@@ -264,6 +269,125 @@ public class SocietyController {
     void enableEditForm(ActionEvent event) {
         // Inside the profilePane, make the displayInfo VBox and the editButton button invisible.
         // In turn, make the editForm VBox visible and the saveButton button visible.
+        editButton.setVisible(false);
+        displayInfo.setVisible(false);
+        editForm.setVisible(true);
+        saveButton.setVisible(true);
+
+        editEmailField.setText(society.getEmail());
+        editDescriptionField.setText(society.getDescription());
+    }
+
+    @FXML
+    void saveProfileChanges(ActionEvent event) {
+        society.setEmail(editEmailField.getText());
+        society.setDescription(editDescriptionField.getText());
+        try{
+            sqlHandler.updateSocietyDetails(society);
+            updateProfileLabels();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        editForm.setVisible(false);
+        saveButton.setVisible(false);
+        editButton.setVisible(true);
+        displayInfo.setVisible(true);
+    }
+
+    @FXML
+    private void setComboBoxDisplay(ComboBox<Student> comboBox) {
+        comboBox.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(Student student, boolean empty) {
+                super.updateItem(student, empty);
+                if (empty || student == null) {
+                    setText(null);
+                } else {
+                    setText(student.getName());
+                }
+            }
+        });
+
+        // Display only the name in the ComboBox's selected value
+        comboBox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Student student, boolean empty) {
+                super.updateItem(student, empty);
+                if (empty || student == null) {
+                    setText(null);
+                } else {
+                    setText(student.getName());
+                }
+            }
+        });
+    }
+
+    void initializeTables() {
+        ArrayList<SocietyMember> members = sqlHandler.getSocietyMembers(society);
+        ArrayList<Student> students = new ArrayList<>();
+
+        try {
+            for (SocietyMember member : members) {
+                students.add(sqlHandler.getStudentDetailsByID(member.getStudentId()));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create observable lists for both tables
+        ObservableList<SocietyMemberRow> tableData = FXCollections.observableArrayList();
+        ObservableList<SocietyMemberRow> membersListData = FXCollections.observableArrayList();
+
+        // Observable lists for combo boxes
+        ObservableList<Student> removeMemberList = FXCollections.observableArrayList();
+        ObservableList<Student> selectMemberList = FXCollections.observableArrayList();
+        ObservableList<Student> approveMemberList = FXCollections.observableArrayList();
+
+        // Populate both tables using member and student information
+        for (int i = 0; i < members.size(); i++) {
+            SocietyMember member = members.get(i);
+            Student student = students.get(i);
+            SocietyMemberRow row = new SocietyMemberRow(student.getName(), member.getRole(), member.getStatus());
+            tableData.add(row);
+
+            // Only add rows to membersListTable with role and name
+            SocietyMemberRow listRow = new SocietyMemberRow(student.getName(), member.getRole(), null);
+            membersListData.add(listRow);
+
+            // Populate combo boxes based on roles and statuses
+            if (member.getStatus().equalsIgnoreCase("Approved")) {
+                if (!member.getRole().equalsIgnoreCase("President")) {
+                    removeMemberList.add(student);
+                    selectMemberList.add(student);
+                }
+            } else if (member.getStatus().equalsIgnoreCase("Pending")) {
+                approveMemberList.add(student);
+            }
+        }
+
+        // Bind the societyMembersTable columns
+        memberNameColumn.setCellValueFactory(new PropertyValueFactory<>("memberName"));
+        memberRoleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+        approvalStatusColumn.setCellValueFactory(new PropertyValueFactory<>("approvalStatus"));
+
+        // Bind the membersListTable columns
+        memberNameColumn1.setCellValueFactory(new PropertyValueFactory<>("memberName"));
+        memberRoleColumn1.setCellValueFactory(new PropertyValueFactory<>("role"));
+
+        // Set the table data
+        societyMembersTable.setItems(tableData);
+        membersListTable.setItems(membersListData);
+
+        // Set combo box data
+        removeMemberComboBox.setItems(removeMemberList);
+        selectMemberComboBox.setItems(selectMemberList);
+        approveMemberComboBox.setItems(approveMemberList);
+
+        // Configure combo boxes to display names
+        setComboBoxDisplay(removeMemberComboBox);
+        setComboBoxDisplay(selectMemberComboBox);
+        setComboBoxDisplay(approveMemberComboBox);
     }
 
     @FXML
@@ -281,25 +405,40 @@ public class SocietyController {
     }
 
     @FXML
-    void saveProfileChanges(ActionEvent event) {
-        // Edit the DB entry to save the changes in profile according to entered data in the fields.
-        // Do the opposite visibility/invisibility actions of what you did for enableEditForm() function.
-        // Only e-mail and description are editable.
-    }
+    void removeMember(ActionEvent event) {
+        // Fetch the selected student from the ComboBox
+        Student selectedStudent = removeMemberComboBox.getSelectionModel().getSelectedItem();
 
-    @FXML
-    void removeMember (ActionEvent event) {
-        // Fetch the society member selected in removeMemberComboBox.
-        // In case of any role except VP or President, removal will be successful. If it's a VP or Pres, Either (a) Send alert saying can't remove VP / President if selected member is VP or President, or (b) Just filter out the VP and President and don't load/display them in the ComboBox in the first place.
-        // Do appropriate action to remove that student as a member of that soceity. I
-    }
+        if (selectedStudent == null) {
+            // If no student is selected, send an alert and exit
+            System.out.println("No student selected for removal.");
+            return;
+        }
 
+        try {
+            sqlHandler.removeFromSociety(selectedStudent.getStudentId(), society.getSocietyId());
+            initializeTables();
+            System.out.println("Student successfully removed from the society.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error removing student from the society.");
+        }
+    }
+    
     @FXML
     void updateRole (ActionEvent event) {
         // Fetch the student selected in selectMemberComboBox.
         // Fetch the role selected in selectRoleComboBox.
         // Update the role of that student.
         // Only secretaries, heads, and members are replaceable. VP and President are not replaceable. (I think)
+        String selectedRole = selectRoleComboBox.getSelectionModel().getSelectedItem();
+        Student selectedStudent = selectMemberComboBox.getSelectionModel().getSelectedItem();
+        if (selectedRole == null) {
+            System.out.println("No role selected for removal.");
+            return;
+        }
+        sqlHandler.updateStudentRole(selectedStudent.getStudentId(), society.getSocietyId(), selectedRole);
+        initializeTables();
     }
 
     @FXML
@@ -309,11 +448,18 @@ public class SocietyController {
     }
 
     @FXML
-    void approveStudent (ActionEvent event) {
-        // You will have loaded the pending members only into the approveMemberComboBox in initializer.
-        // Fetch selected student from approveMemberComboBox.
-        // Do appropriate action to add that student as a member of that society.
+    void approveStudent(ActionEvent event) {
+        Student selectedStudent = approveMemberComboBox.getSelectionModel().getSelectedItem();
+        if (selectedStudent == null) {
+            System.out.println("No student selected for approval.");
+            return;
+        }
+
+        sqlHandler.approveStudent(selectedStudent.getStudentId(), society.getSocietyId());
+        initializeTables();
+        System.out.println("Student has been approved and role updated.");
     }
+
 
     @FXML
     void showManageRolesPane(ActionEvent event) {

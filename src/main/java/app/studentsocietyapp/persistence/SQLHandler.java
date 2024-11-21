@@ -79,6 +79,30 @@ public class SQLHandler extends PersistenceHandler {
         return null; // No student found with the provided account_id
     }
 
+    public Student getStudentDetailsByID(int student_id) throws SQLException {
+        String query = "SELECT * FROM Student WHERE student_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, student_id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Student(
+                            rs.getInt("student_id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("batch"),
+                            rs.getString("rollnumber"),
+                            rs.getString("phone"),
+                            rs.getInt("account_id")
+                    );
+                }
+            }
+        }
+        return null; // No student found with the provided account_id
+    }
+
     // Fetch the account details using account_id
     public Account getAccountDetails(int accountId) throws SQLException {
         String query = "SELECT * FROM Account WHERE account_id = ?";
@@ -193,7 +217,43 @@ public class SQLHandler extends PersistenceHandler {
         return societyRoles;
     }
 
+    public SocietyRole getStudentSocietyRole(int studentId, int societyId) throws SQLException {
+        String query = "SELECT s.society_id, s.name, s.email, s.members, s.description, s.isApproved, s.account_id, " +
+                "sm.role " +
+                "FROM Society s " +
+                "INNER JOIN SocietyMember sm ON sm.society_id = s.society_id " +
+                "WHERE sm.student_id = ? AND sm.society_id = ? AND sm.status = 'Approved'"; // Only approved societies
 
+        SocietyRole societyRole = null;
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, studentId);
+            stmt.setInt(2, societyId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Create Society object
+                    Society society = new Society(
+                            rs.getInt("society_id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getInt("members"),
+                            rs.getString("description"),
+                            rs.getBoolean("isApproved"),
+                            rs.getInt("account_id")
+                    );
+
+                    // Get the role from the result set
+                    String role = rs.getString("role");
+
+                    // Create a SocietyRole object and add it to the list
+                    societyRole = new SocietyRole(society.getName(), role);
+                }
+            }
+        }
+        return societyRole;
+    }
 
     public void applyToSociety(int studentId, String societyName, String role, String comments) throws SQLException {
         // Step 1: Get the society_id using the GetAllSocieties procedure
@@ -297,6 +357,106 @@ public class SQLHandler extends PersistenceHandler {
             stmt.setString(5, student.getPhone());
             stmt.setInt(6, student.getStudentId());
             stmt.executeUpdate();
+        }
+    }
+
+    public void removeFromSociety(int studentId, int societyId) throws SQLException {
+        String query = "DELETE FROM SocietyMember WHERE student_id = ? AND society_id = ?";
+        try (Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setInt(1, studentId);
+            stmt.setInt(2, societyId);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void relinquishRoleInSociety(int studentId, int societyId) {
+        // First, update the role to 'Member'
+        String updateRoleProcedure = "{CALL UpdateSocietyMemberRole(?, ?, ?)}";
+        try (Connection conn = getConnection();
+             CallableStatement stmt = conn.prepareCall(updateRoleProcedure)) {
+            stmt.setInt(1, studentId);
+            stmt.setInt(2, societyId);
+            stmt.setString(3, "Member");
+            stmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return; // If updating the role fails, don't proceed with removing
+        }
+        // Then remove the student from the society
+        try {
+            removeFromSociety(studentId, societyId);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateSocietyDetails(Society society) throws SQLException {
+        String query = "UPDATE Society SET email = ?, description = ? WHERE society_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, society.getEmail());
+            stmt.setString(2, society.getDescription());
+            stmt.setInt(3, society.getSocietyId());
+            stmt.executeUpdate();
+        }
+    }
+
+    public ArrayList<SocietyMember> getSocietyMembers(Society society) {
+        ArrayList<SocietyMember> members = new ArrayList<>();
+        String query = "SELECT * FROM SocietyMember WHERE society_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, society.getSocietyId());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // Create a SocietyMember object for each row in the result set
+                SocietyMember member = new SocietyMember(rs.getInt("member_id"),
+                        rs.getString("role"),
+                        rs.getInt("society_id"),
+                        rs.getInt("student_id"),
+                        rs.getString("status")
+                );
+                // Add the member to the list
+                members.add(member);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return members;
+    }
+
+    public void approveStudent(int studentId, int societyId) {
+        String query = "UPDATE SocietyMember SET status = 'Approved', role = 'Member' WHERE student_id = ? AND society_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, studentId);
+            stmt.setInt(2, societyId);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateStudentRole(int studentId, int societyId, String selectedRole) {
+        String query = "{CALL UpdateSocietyMemberRole(?, ?, ?)}";
+        try(Connection conn = getConnection();
+            CallableStatement stmt = conn.prepareCall(query)){
+            stmt.setInt(1, studentId);
+            stmt.setInt(2, societyId);
+            stmt.setString(3, selectedRole);
+            stmt.execute();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

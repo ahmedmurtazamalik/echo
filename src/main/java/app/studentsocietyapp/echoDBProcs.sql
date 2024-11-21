@@ -130,13 +130,14 @@ BEGIN
 END$$
 
 CREATE PROCEDURE UpdateSocietyMemberRole(
-    IN p_member_id INT,
+    IN p_student_id INT,
+    IN p_society_id INT,
     IN p_role VARCHAR(50)
 )
 BEGIN
     UPDATE SocietyMember
     SET role = p_role
-    WHERE member_id = p_member_id;
+    WHERE student_id = p_student_id AND society_id = p_society_id;
 END$$
 
 CREATE PROCEDURE GetSocietyMembers(IN p_society_id INT)
@@ -176,7 +177,7 @@ BEGIN
     SELECT sm.member_id, st.name AS student_name, sm.role, sm.status
     FROM SocietyMember sm
              JOIN Student st ON sm.student_id = st.student_id
-    WHERE sm.society_id = p_society_id;
+    WHERE sm.society_id = p_society_id AND sm.status = 'Pending';
 END$$
 
 -- Procedure to get all approved members for a society
