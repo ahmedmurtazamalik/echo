@@ -1,6 +1,8 @@
 package app.studentsocietyapp;
 
+import app.studentsocietyapp.controller.SocietyController;
 import app.studentsocietyapp.controller.StudentController;
+import app.studentsocietyapp.model.Society;
 import app.studentsocietyapp.model.Student;
 import app.studentsocietyapp.persistence.SQLHandler;
 import javafx.fxml.FXMLLoader;
@@ -41,13 +43,10 @@ public class MainController {
         String password = passwordinputfield.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            signinformlabel.setText("Please enter both username and password.");
+            showErrorAlert("Invalid Input", "Please enter both username and password.");
             return;
         }
 
-        // Implement logic for sign in different views. For now, only student view has been created so placeholders for other 2 views can be created.
-        // Sign UP logic will be tackled later.
-        // Below given try-catch block switches from signin screen to student view.
         int accountType = -1;
         int accountID = -1;
         int[] accountDetails = {-1, -1};
@@ -55,35 +54,23 @@ public class MainController {
         // Load the second FXML file
         try {
             accountDetails = sqlHandler.authenticateUser(username, password);
-        }
-        catch (SQLException e) {
-            System.out.println(e.toString());
+        } catch (SQLException e) {
+            showErrorAlert("Authentication Error", "Error during authentication. Please try again.");
+            return;
         }
 
         accountID = accountDetails[0];
         accountType = accountDetails[1];
 
         if (accountType == -1) {
-            signinformlabel.setText("Invalid username or password.");
+            showErrorAlert("Invalid Credentials", "Invalid username or password.");
         } else {
-            // Fetch student details if the user is a student (accountType = 1)
-            if (accountType == 1) {
-                try {
-                    Student student = sqlHandler.getStudentDetails(accountID);
-                    if (student != null) {
-                        redirectUser(event, accountType, student); // Pass student object to the next view
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                redirectUser(event, accountType, null);
-            }
+            redirectUser(event, accountType, accountID);
         }
     }
 
     // Redirect the user based on the account type
-    private void redirectUser(ActionEvent event, int accountType, Student student) {
+    private void redirectUser(ActionEvent event, int accountType, int accountID) {
         try {
             String fxmlFile = "";
             switch (accountType) {
@@ -97,28 +84,47 @@ public class MainController {
                     fxmlFile = "view/admin-view.fxml";
                     break;
                 default:
-                    signinformlabel.setText("Unknown account type.");
+                    showErrorAlert("Unknown Account Type", "Unknown account type.");
                     return;
             }
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root = loader.load();
 
-            // If it's a student, pass the student details to the next view (e.g., student-view.fxml)
-            if (student != null) {
-                StudentController studentController = loader.getController();
-                System.out.println("Student Name: " + student.getName());
-                studentController.setStudentDetails(student);  // Passing student object to the view
+            if (accountType == 1) {
+                Student student = sqlHandler.getStudentDetails(accountID);
+                // If it's a student, pass the student details to the next view (e.g., student-view.fxml)
+                if (student != null) {
+                    StudentController studentController = loader.getController();
+                    System.out.println("Student Name: " + student.getName());
+                    studentController.setStudentDetails(student);  // Passing student object to the view
+                }
+            } else if (accountType == 2) {
+                Society society = sqlHandler.getSocietyDetails(accountID);
+                if (society != null) {
+                    SocietyController societyController = loader.getController();
+                    System.out.println("Society Name: " + society.getName());
+                    societyController.setSocietyDetails(society);
+                }
             }
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
-            signinformlabel.setText("Failed to load the view.");
+            showErrorAlert("View Load Error", "Failed to load the view.");
         } catch (SQLException e) {
+            showErrorAlert("Database Error", "Failed to fetch data from the database.");
             throw new RuntimeException(e);
         }
     }
+
+    // Helper method to show error alerts
+    private void showErrorAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }

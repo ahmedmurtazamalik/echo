@@ -1,12 +1,11 @@
 CREATE DATABASE echoDB;
 USE echoDB;
 
-
 CREATE TABLE Account (
-                         account_id INT AUTO_INCREMENT PRIMARY KEY,
-                         username VARCHAR(50) NOT NULL UNIQUE,
-                         password VARCHAR(100) NOT NULL,
-                         accountType VARCHAR(7) NOT NULL
+    account_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    accountType VARCHAR(7) NOT NULL
 );
 
 CREATE TABLE Student (
@@ -36,6 +35,7 @@ CREATE TABLE SocietyMember (
     role VARCHAR(50) NOT NULL,
     society_id INT NOT NULL,
     student_id INT NOT NULL,
+    status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
     FOREIGN KEY (society_id) REFERENCES Society(society_id),
     FOREIGN KEY (student_id) REFERENCES Student(student_id)
 );

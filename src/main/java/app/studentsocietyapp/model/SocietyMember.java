@@ -5,12 +5,14 @@ public class SocietyMember {
     private String role;
     private int societyId;
     private int studentId;
+    private String status;
 
-    public SocietyMember(int memberId, String role, int societyId, int studentId) {
+    public SocietyMember(int memberId, String role, int societyId, int studentId, String status) {
         this.memberId = memberId;
         this.role = role;
         this.societyId = societyId;
         this.studentId = studentId;
+        this.status = status;
     }
 
     // Getters and setters
@@ -25,4 +27,7 @@ public class SocietyMember {
 
     public int getStudentId() { return studentId; }
     public void setStudentId(int studentId) { this.studentId = studentId; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

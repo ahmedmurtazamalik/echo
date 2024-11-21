@@ -1,4 +1,4 @@
-use echodb;
+USE echoDB;
 
 -- Insert Dummy Accounts for Students
 INSERT INTO Account (username, password, accountType) VALUES
@@ -29,3 +29,12 @@ INSERT INTO Society (name, email, members, description, isApproved, account_id) 
                                                                                     ('Science Club', 'science.club@society.com', 50, 'A club for science enthusiasts.', 1, 4),
                                                                                     ('Literature Society', 'literature.society@society.com', 40, 'A society for book lovers.', 1, 5),
                                                                                     ('Music Band', 'music.band@society.com', 30, 'A society for music lovers.', 0, 6);
+
+-- Insert Dummy Society Members
+INSERT INTO SocietyMember (role, society_id, student_id, status) VALUES
+                                                                     ('President', 1, 1, 'Approved'), -- John Doe as President of Science Club
+                                                                     ('Member', 1, 2, 'Approved'),    -- Jane Smith as Member of Science Club
+                                                                     ('Treasurer', 2, 3, 'Approved'), -- Alice Johnson as Treasurer of Literature Society
+                                                                     ('Member', 2, 1, 'Pending'),     -- John Doe applied to Literature Society
+                                                                     ('Vice President', 3, 2, 'Pending'), -- Jane Smith applied to Music Band
+                                                                     ('Member', 3, 3, 'Rejected');     -- Alice Johnson rejected from Music Band

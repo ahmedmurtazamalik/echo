@@ -9,13 +9,14 @@ public class Society {
     private boolean isApproved;
     private int accountId;
 
-    public Society(int societyId, String name, String email, int members, String description, boolean isApproved) {
+    public Society(int societyId, String name, String email, int members, String description, boolean isApproved, int accountId) {
         this.societyId = societyId;
         this.name = name;
         this.email = email;
         this.members = members;
         this.description = description;
         this.isApproved = isApproved;
+        this.accountId = accountId;
     }
 
     // Getters and setters
@@ -31,4 +32,6 @@ public class Society {
     public void setDescription(String description) { this.description = description; }
     public boolean isApproved() { return isApproved; }
     public void setApproved(boolean approved) { isApproved = approved; }
+    public int getAccountId() { return accountId; }
+    public void setAccountId(int accountId) { this.accountId = accountId; }
 }

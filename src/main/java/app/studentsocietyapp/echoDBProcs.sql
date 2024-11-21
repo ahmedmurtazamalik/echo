@@ -3,9 +3,6 @@ USE echoDB;
 DELIMITER $$
 
 -- ********** Student Procedures **********
-DELIMITER $$
-
--- ********** Student Procedures **********
 CREATE PROCEDURE CreateStudent(
     IN p_username VARCHAR(50),
     IN p_password VARCHAR(100),
@@ -133,13 +130,14 @@ BEGIN
 END$$
 
 CREATE PROCEDURE UpdateSocietyMemberRole(
-    IN p_member_id INT,
+    IN p_student_id INT,
+    IN p_society_id INT,
     IN p_role VARCHAR(50)
 )
 BEGIN
     UPDATE SocietyMember
     SET role = p_role
-    WHERE member_id = p_member_id;
+    WHERE student_id = p_student_id AND society_id = p_society_id;
 END$$
 
 CREATE PROCEDURE GetSocietyMembers(IN p_society_id INT)
@@ -148,6 +146,49 @@ BEGIN
     FROM SocietyMember sm
              JOIN Student st ON sm.student_id = st.student_id
     WHERE sm.society_id = p_society_id;
+END$$
+
+CREATE PROCEDURE ApplyForRole(
+    IN p_role VARCHAR(50),
+    IN p_society_id INT,
+    IN p_student_id INT
+)
+BEGIN
+    INSERT INTO SocietyMember (role, society_id, student_id, status)
+    VALUES (p_role, p_society_id, p_student_id, 'Pending');
+END$$
+
+-- Procedure to update the status of a role application
+CREATE PROCEDURE UpdateRoleApplicationStatus(
+    IN p_member_id INT,
+    IN p_status ENUM('Pending', 'Approved', 'Rejected')
+)
+BEGIN
+    UPDATE SocietyMember
+    SET status = p_status
+    WHERE member_id = p_member_id;
+END$$
+
+-- Procedure to get all role applications for a society
+CREATE PROCEDURE GetRoleApplications(
+    IN p_society_id INT
+)
+BEGIN
+    SELECT sm.member_id, st.name AS student_name, sm.role, sm.status
+    FROM SocietyMember sm
+             JOIN Student st ON sm.student_id = st.student_id
+    WHERE sm.society_id = p_society_id AND sm.status = 'Pending';
+END$$
+
+-- Procedure to get all approved members for a society
+CREATE PROCEDURE GetApprovedMembers(
+    IN p_society_id INT
+)
+BEGIN
+    SELECT sm.member_id, st.name AS student_name, sm.role
+    FROM SocietyMember sm
+             JOIN Student st ON sm.student_id = st.student_id
+    WHERE sm.society_id = p_society_id AND sm.status = 'Approved';
 END$$
 
 -- ********** Account Procedures **********
