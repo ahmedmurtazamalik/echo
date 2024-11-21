@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefWidth="800" stylesheets="@societyview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.studentsocietyapp.controller.SocietyController">
+<BorderPane prefWidth="800" stylesheets="@societyview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AdminController">
    <top>
       <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #4A90E2; -fx-padding: 10;">
          <children>
@@ -46,10 +46,10 @@
                         </VBox>
                         <VBox spacing="10" style="-fx-pref-width: 150;">
                            <children>
-                              <Button fx:id="addSocietyButton" onAction="#showManageMembersPane" styleClass="dashboard-button" text="Add a New Society" />
-                              <Button fx:id="approveEventButton" mnemonicParsing="false" onAction="#showManageRolesPane" styleClass="dashboard-button" text="Pending Events" />
-                              <Button fx:id="approveSocietyButton" onAction="#showMakePostPane" styleClass="dashboard-button" text="Pending Societies" />
-                              <Button fx:id="addVenueButton" onAction="#showMakeAnnouncementPane" prefWidth="156.0" style="-fx-font-size: ;" styleClass="dashboard-button" text="Add a New Venue" />
+                              <Button fx:id="addSocietyButton" onAction="#showAddSocietyPane" styleClass="dashboard-button" text="Add a New Society" />
+                              <Button fx:id="approveEventButton" mnemonicParsing="false" onAction="#showApproveEventPane" styleClass="dashboard-button" text="Pending Events" />
+                              <Button fx:id="approveSocietyButton" onAction="#showApproveSocietyPane" styleClass="dashboard-button" text="Pending Societies" />
+                              <Button fx:id="addVenueButton" onAction="#showAddVenuePane" prefWidth="156.0" style="-fx-font-size: ;" styleClass="dashboard-button" text="Add a New Venue" />
                            </children>
                         </VBox>
                      </children>
