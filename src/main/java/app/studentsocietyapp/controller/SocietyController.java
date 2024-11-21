@@ -223,6 +223,42 @@ public class SocietyController {
     @FXML
     private Button approveMemberButton;
 
+    @FXML
+    private Button switchToPostsButton;
+
+    @FXML
+    private Button switchToAnnouncementsButton;
+
+    @FXML
+    private TableView<?> announcementsTable;
+
+    @FXML
+    private TableColumn<?,?> announcementIDColumn;
+
+    @FXML
+    private TableColumn<?,?> announcementDateColumn;
+
+    @FXML
+    private TableColumn<?,?> announcementByColumn;
+
+    @FXML
+    private TableColumn<?,?> announcementDescriptionColumn;
+
+    @FXML
+    private TableView<?> postsTable;
+
+    @FXML
+    private TableColumn<?,?> postIDColumn;
+
+    @FXML
+    private TableColumn<?,?> postDateColumn;
+
+    @FXML
+    private TableColumn<?,?> postByColumn;
+
+    @FXML
+    private TableColumn<?,?> postDescriptionColumn;
+
     private SQLHandler sqlHandler;
     private Society society;
 
@@ -494,6 +530,36 @@ public class SocietyController {
         System.out.println("Student has been approved and role updated.");
     }
 
+    /*
+    {
+
+      A function that fires each time a cell inside the postsTable is clicked.
+      It will retrieve the ID of the post that was clicked. IDs are supposed to be stored in first cell of each row.
+      Using that ID, other information about the post will be retrieved.
+      An information type alert will be sent that shows all the data of the post.
+      Basically, this serves as a "view entire post" thing.
+
+    }
+    */
+
+
+    /*
+    {
+
+        Same thing but for announcements table.
+
+    }
+    */
+
+    @FXML
+    void switchToPosts(ActionEvent event) {
+        //homePosts = visible, homeAnnouncements = invisible
+    }
+
+    @FXML
+    void switchToAnnouncements(ActionEvent event) {
+        // vice versa
+    }
 
     @FXML
     void showManageRolesPane(ActionEvent event) {

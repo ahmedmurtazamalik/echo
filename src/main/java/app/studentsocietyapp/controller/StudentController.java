@@ -180,6 +180,67 @@ public class StudentController {
     @FXML
     private Button rolerelinquishNo;
 
+    @FXML
+    private Button switchToPostsButton;
+
+    @FXML
+    private Button switchToAnnouncementsButton;
+
+
+    @FXML
+    private AnchorPane homeAnnouncements;
+
+    @FXML
+    private AnchorPane homePosts;
+
+    @FXML
+    private TableView<?> announcementsTable;
+
+    @FXML
+    private TableColumn<?,?> announcementIDColumn;
+
+    @FXML
+    private TableColumn<?,?> announcementDateColumn;
+
+    @FXML
+    private TableColumn<?,?> announcementByColumn;
+
+    @FXML
+    private TableColumn<?,?> announcementDescriptionColumn;
+
+    @FXML
+    private ComboBox<?> selectAnnouncementComboBox;
+
+    @FXML
+    private TextArea announcementCommentTextArea;
+
+    @FXML
+    private Button submitAnnouncementCommentButton;
+
+    @FXML
+    private TableView<?> postsTable;
+
+    @FXML
+    private TableColumn<?,?> postIDColumn;
+
+    @FXML
+    private TableColumn<?,?> postDateColumn;
+
+    @FXML
+    private TableColumn<?,?> postByColumn;
+
+    @FXML
+    private TableColumn<?,?> postDescriptionColumn;
+
+    @FXML
+    private ComboBox<?> selectPostComboBox;
+
+    @FXML
+    private TextArea postCommentTextArea;
+
+    @FXML
+    private Button submitPostCommentButton;
+
     private SQLHandler sqlHandler;
     private Student student;
 
@@ -304,7 +365,49 @@ public class StudentController {
         }
     }
 
+    /*
+    {
+
+      A function that fires each time a cell inside the postsTable is clicked.
+      It will retrieve the ID of the post that was clicked. IDs are supposed to be stored in first cell of each row.
+      Using that ID, other information about the post will be retrieved.
+      An information type alert will be sent that shows all the data of the post.
+      Basically, this serves as a "view entire post" thing.
+
+    }
+    */
+
+
+    /*
+    {
+
+        Same thing but for announcements table.
+
+    }
+    */
+
+    @FXML
+    void submitAnnouncementComment() {
+
+    }
+
+    @FXML
+    void submitPostComment(ActionEvent event) {
+
+    }
+
+
     // Methods for switching panes
+    @FXML
+    void switchToPosts(ActionEvent event) {
+        //homePosts = visible, homeAnnouncements = invisible
+    }
+
+    @FXML
+    void switchToAnnouncements(ActionEvent event) {
+        // vice versa
+    }
+
     @FXML
     void showProfilePane(ActionEvent event) {
         profilePane.setVisible(true);
