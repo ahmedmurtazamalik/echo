@@ -6,13 +6,15 @@ public class Comment {
     private int commentId;
     private int studentId;
     private String content;
+    private String studentName;
     private Date date;
 
-    public Comment(int commentId, int studentId, String content, Date date) {
+    public Comment(int commentId, int studentId, String content, String studentName, Date date) {
         this.commentId = commentId;
         this.studentId = studentId;
         this.content = content;
         this.date = date;
+        this.studentName = studentName;
     }
 
     // Getters and setters
@@ -27,5 +29,8 @@ public class Comment {
 
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
+
+    public String getStudentName() { return studentName; }
+    public void setStudentName(String studentName) { this.studentName = studentName; }
 }
 

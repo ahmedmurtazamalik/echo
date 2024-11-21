@@ -5,12 +5,16 @@ import java.util.Date;
 public class Post {
     private int postId;
     private int accountId;
+    private String accountName;
+    private String title;
     private String content;
     private Date date;
 
-    public Post(int postId, int accountId, String content, Date date) {
+    public Post(int postId, int accountId, String accountName, String title,String content, Date date) {
         this.postId = postId;
         this.accountId = accountId;
+        this.accountName = accountName;
+        this.title = title;
         this.content = content;
         this.date = date;
     }
@@ -27,4 +31,10 @@ public class Post {
 
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getAccountName() { return accountName; }
+    public void setAccountName(String accountName) { this.accountName = accountName; }
 }

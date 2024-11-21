@@ -391,26 +391,64 @@ public class SocietyController {
     }
 
     @FXML
-    void makeAnnouncement(ActionEvent event) {
-        // Fetch the data that the user inputs in announcementTitleField and announcementContentArea.
-        // Make a new entry in Post table in DB with the relevant data.
-        // Send alerts (message) in case of successful/failed posts.
+    void makePost(ActionEvent event) {
+        String postTitle = postTitleField.getText();
+        String postContent = postContentArea.getText();
+
+        if (postTitle.isEmpty() || postContent.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("Cannot Create Post");
+            alert.setContentText("Post title and content cannot be empty.");
+            alert.showAndWait();
+            return;
+        }
+
+        sqlHandler.createPost(society.getAccountId(), society.getName(), postTitle, postContent);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Post Created");
+        alert.setHeaderText("Success");
+        alert.setContentText("Your post has been successfully created.");
+        alert.showAndWait();
+
+        postTitleField.clear();
+        postContentArea.clear();
     }
 
     @FXML
-    void makePost(ActionEvent event) {
-        // Fetch the data that the user inputs in postTitleField and postContentArea.
-        // Make a new entry in Post table in DB with the relevant data.
-        // Send alerts (message) in case of successful/failed posts.
+    void makeAnnouncement(ActionEvent event) {
+        String announcementTitle = announcementTitleField.getText();
+        String announcementContent = announcementContentArea.getText();
+
+        if (announcementTitle.isEmpty() || announcementContent.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("Cannot Create Announcement");
+            alert.setContentText("Announcement title and content cannot be empty.");
+            alert.showAndWait();
+            return;
+        }
+
+        // Assuming the society ID is passed to the `createPost` method for announcements
+        sqlHandler.createAnnouncement(society.getSocietyId(), society.getName(), announcementTitle, announcementContent);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Announcement Created");
+        alert.setHeaderText("Success");
+        alert.setContentText("Your announcement has been successfully created.");
+        alert.showAndWait();
+
+        announcementTitleField.clear();
+        announcementContentArea.clear();
     }
+
 
     @FXML
     void removeMember(ActionEvent event) {
-        // Fetch the selected student from the ComboBox
         Student selectedStudent = removeMemberComboBox.getSelectionModel().getSelectedItem();
 
         if (selectedStudent == null) {
-            // If no student is selected, send an alert and exit
             System.out.println("No student selected for removal.");
             return;
         }
@@ -427,10 +465,6 @@ public class SocietyController {
     
     @FXML
     void updateRole (ActionEvent event) {
-        // Fetch the student selected in selectMemberComboBox.
-        // Fetch the role selected in selectRoleComboBox.
-        // Update the role of that student.
-        // Only secretaries, heads, and members are replaceable. VP and President are not replaceable. (I think)
         String selectedRole = selectRoleComboBox.getSelectionModel().getSelectedItem();
         Student selectedStudent = selectMemberComboBox.getSelectionModel().getSelectedItem();
         if (selectedRole == null) {

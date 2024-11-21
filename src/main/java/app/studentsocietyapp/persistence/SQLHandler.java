@@ -459,4 +459,34 @@ public class SQLHandler extends PersistenceHandler {
             e.printStackTrace();
         }
     }
+
+    public void createPost(int accountId, String name, String postTitle, String postContent) {
+        String query = "CALL CreatePost (?, ?, ?, ?)";
+        try(Connection conn = getConnection();
+            CallableStatement stmt = conn.prepareCall(query)){
+            stmt.setInt(1, accountId);
+            stmt.setString(2, name);
+            stmt.setString(3, postTitle);
+            stmt.setString(4, postContent);
+            stmt.execute();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createAnnouncement(int societyId, String name, String announcementTitle, String announcementContent) {
+        String query = "CALL CreateAnnouncement (?, ?, ?, ?)";
+        try(Connection conn = getConnection();
+            CallableStatement stmt = conn.prepareCall(query)){
+            stmt.setInt(1, societyId);
+            stmt.setString(2, name);
+            stmt.setString(3, announcementTitle);
+            stmt.setString(4, announcementContent);
+            stmt.execute();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

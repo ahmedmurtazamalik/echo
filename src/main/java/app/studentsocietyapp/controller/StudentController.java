@@ -407,5 +407,27 @@ public class StudentController {
     }
 
     public void makePost(ActionEvent actionEvent) {
+        String postTitle = postTitleField.getText();
+        String postContent = postContentArea.getText();
+
+        if (postTitle.isEmpty() || postContent.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("Cannot Create Post");
+            alert.setContentText("Post title and content cannot be empty.");
+            alert.showAndWait();
+            return;
+        }
+
+        sqlHandler.createPost(student.getAccountId(), student.getName(), postTitle, postContent);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Post Created");
+        alert.setHeaderText("Success");
+        alert.setContentText("Your post has been successfully created.");
+        alert.showAndWait();
+
+        postTitleField.clear();
+        postContentArea.clear();
     }
 }

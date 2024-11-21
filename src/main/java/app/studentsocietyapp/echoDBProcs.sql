@@ -232,11 +232,13 @@ END$$
 -- ********** Post Procedures **********
 CREATE PROCEDURE CreatePost(
     IN p_account_id INT,
+    IN p_name VARCHAR(255),
+    IN p_title VARCHAR(255),
     IN p_content TEXT
 )
 BEGIN
-    INSERT INTO Post (account_id, content)
-    VALUES (p_account_id, p_content);
+    INSERT INTO Post (account_id, name ,title ,content)
+    VALUES (p_account_id, p_name, p_title, p_content);
 END$$
 
 CREATE PROCEDURE GetPostById(IN p_post_id INT)
@@ -287,11 +289,13 @@ END$$
 -- ********** Announcement Procedures **********
 CREATE PROCEDURE CreateAnnouncement(
     IN p_society_id INT,
+    IN p_name VARCHAR(255),
+    IN p_title VARCHAR(255),
     IN p_content TEXT
 )
 BEGIN
-    INSERT INTO Announcement (society_id, content)
-    VALUES (p_society_id, p_content);
+    INSERT INTO Announcement (society_id, name, title, content)
+    VALUES (p_society_id, p_name, p_title, p_content);
 END$$
 
 CREATE PROCEDURE GetAnnouncementById(IN p_announcement_id INT)

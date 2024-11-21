@@ -43,6 +43,8 @@ CREATE TABLE SocietyMember (
 CREATE TABLE Post (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     account_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     date DATETIME DEFAULT NOW(),
     FOREIGN KEY (account_id) REFERENCES Account(account_id)
@@ -51,6 +53,8 @@ CREATE TABLE Post (
 CREATE TABLE Announcement (
     announcement_id INT AUTO_INCREMENT PRIMARY KEY,
     society_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     date DATETIME DEFAULT NOW(),
     FOREIGN KEY (society_id) REFERENCES Society(society_id)
@@ -96,6 +100,7 @@ CREATE TABLE EventScheduled (
 CREATE TABLE Comment (
     comment_id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     date DATETIME DEFAULT NOW(),
     FOREIGN KEY (student_id) REFERENCES Student(student_id)
