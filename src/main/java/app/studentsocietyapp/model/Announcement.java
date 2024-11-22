@@ -5,12 +5,16 @@ import java.util.Date;
 public class Announcement {
     private int announcementId;
     private int societyId;
+    private String societyName;
+    private String title;
     private String content;
     private Date date;
 
-    public Announcement(int announcementId, int societyId, String content, Date date) {
+    public Announcement(int announcementId, int societyId, String societyName, String title, String content, Date date) {
         this.announcementId = announcementId;
         this.societyId = societyId;
+        this.societyName = societyName;
+        this.title = title;
         this.content = content;
         this.date = date;
     }
@@ -27,4 +31,15 @@ public class Announcement {
 
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getSocietyName() { return societyName; }
+    public void setSocietyName(String societyName) { this.societyName = societyName; }
+
+    @Override
+    public String toString() {
+        return String.valueOf(announcementId);
+    }
 }
