@@ -4,7 +4,6 @@ import app.studentsocietyapp.model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class SQLHandler extends PersistenceHandler {
 
@@ -342,10 +341,9 @@ public class SQLHandler extends PersistenceHandler {
                 }
             }
         }
-        return null;  // Return null if no society with the given name was found
+        return null;
     }
 
-    // Update student details
     public void updateStudentDetails(Student student) throws SQLException {
         String query = "UPDATE Student SET name = ?, email = ?, batch = ?, rollnumber = ?, phone = ? WHERE student_id = ?";
         try (Connection conn = getConnection();
@@ -384,9 +382,8 @@ public class SQLHandler extends PersistenceHandler {
             stmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            return; // If updating the role fails, don't proceed with removing
+            return;
         }
-        // Then remove the student from the society
         try {
             removeFromSociety(studentId, societyId);
         }
@@ -416,14 +413,12 @@ public class SQLHandler extends PersistenceHandler {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                // Create a SocietyMember object for each row in the result set
                 SocietyMember member = new SocietyMember(rs.getInt("member_id"),
                         rs.getString("role"),
                         rs.getInt("society_id"),
                         rs.getInt("student_id"),
                         rs.getString("status")
                 );
-                // Add the member to the list
                 members.add(member);
             }
         } catch (SQLException e) {
@@ -489,4 +484,138 @@ public class SQLHandler extends PersistenceHandler {
             e.printStackTrace();
         }
     }
+
+    public ArrayList<Comment> getCommentsForAnnouncement(int announcementId) {
+        String query = "SELECT comment.comment_id, student_id, name, content, date FROM Comment " +
+                "JOIN announcementcomment AS a ON Comment.comment_id = a.comment_id " +
+                "WHERE a.announcement_id = ?";
+        return getComments(announcementId, query);
+    }
+
+    private ArrayList<Comment> getComments(int announcementId, String query) {
+        ArrayList<Comment> comments = new ArrayList<>();
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, announcementId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int commentId = resultSet.getInt("comment_id");
+                int studentId = resultSet.getInt("student_id");
+                String name = resultSet.getString("name");
+                String content = resultSet.getString("content");
+                Date date = resultSet.getDate("date");
+
+                Comment comment = new Comment(commentId, studentId, content, name, date);
+                comments.add(comment);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return comments;
+    }
+
+    public ArrayList<Comment> getCommentsForPost(int postId) {
+        String query = "SELECT comment.comment_id, student_id, name, content, date FROM Comment JOIN postcomment AS p " +
+                "ON Comment.comment_id = p.comment_id WHERE p.post_id = ?";
+        return getComments(postId, query);
+    }
+
+    public ArrayList<Post> getAllPosts() {
+        ArrayList<Post> posts = new ArrayList<>();
+        String query = "SELECT post_id, account_id, name, title, content, date FROM Post";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int postId = resultSet.getInt("post_id");
+                int accountId = resultSet.getInt("account_id");
+                String accountName = resultSet.getString("name");
+                String title = resultSet.getString("title");
+                String content = resultSet.getString("content");
+                Date date = resultSet.getDate("date");
+
+                Post post = new Post(postId, accountId, accountName, title, content, date);
+                posts.add(post);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return posts;
+    }
+
+    public ArrayList<Announcement> getAllAnnouncements() {
+        ArrayList<Announcement> announcements = new ArrayList<>();
+        String query = "SELECT announcement_id, society_id, name, title, content, date FROM Announcement";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int announcementId = resultSet.getInt("announcement_id");
+                int societyId = resultSet.getInt("society_id");
+                String societyName = resultSet.getString("name");
+                String title = resultSet.getString("title");
+                String content = resultSet.getString("content");
+                Date date = resultSet.getDate("date");
+
+                Announcement announcement = new Announcement(announcementId, societyId, societyName, title, content, date);
+                announcements.add(announcement);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return announcements;
+    }
+
+    public void makeAnnouncementComment(int studentId, int announcementId, String name, String commentText) {
+        String query = "{CALL CreateAnnouncementComment(?, ?, ?, ?, ?, ?)}";
+
+        try (Connection connection = getConnection();
+             CallableStatement stmt = connection.prepareCall(query)) {
+
+            Date currentDate = new Date(System.currentTimeMillis());
+
+            stmt.setInt(1, 0);
+            stmt.setInt(2, studentId);
+            stmt.setInt(3, announcementId);
+            stmt.setString(4, commentText);
+            stmt.setString(5, name);
+            stmt.setTimestamp(6, new Timestamp(currentDate.getTime()));
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void makePostComment(int studentId, int postId, String name, String commentText) {
+        String query = "{CALL CreatePostComment(?, ?, ?, ?, ?, ?)}";
+
+        try (Connection connection = getConnection();
+             CallableStatement stmt = connection.prepareCall(query)) {
+
+            Date currentDate = new Date(System.currentTimeMillis());
+            System.out.println(commentText);
+            stmt.setInt(1, 0);
+            stmt.setInt(2, studentId);
+            stmt.setInt(3, postId);
+            stmt.setString(4, commentText);
+            stmt.setString(5, name);
+            stmt.setTimestamp(6, new Timestamp(currentDate.getTime()));
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

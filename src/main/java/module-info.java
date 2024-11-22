@@ -6,11 +6,9 @@ module app.studentsocietyapp {
 
     exports app.studentsocietyapp;
 
-        opens app.studentsocietyapp to
-        javafx.fxml;
-
-        opens app.studentsocietyapp.controller to javafx.fxml;
+    opens app.studentsocietyapp.controller to javafx.fxml;
 
         exports app.studentsocietyapp.model; // Export the model package
-        opens app.studentsocietyapp.model to javafx.base; // Open the model package to javafx.base
+        opens app.studentsocietyapp.model to javafx.base;
+    opens app.studentsocietyapp to javafx.base, javafx.fxml; // Open the model package to javafx.base
 }

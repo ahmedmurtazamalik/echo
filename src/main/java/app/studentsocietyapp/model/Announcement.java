@@ -37,4 +37,9 @@ public class Announcement {
 
     public String getSocietyName() { return societyName; }
     public void setSocietyName(String societyName) { this.societyName = societyName; }
+
+    @Override
+    public String toString() {
+        return String.valueOf(announcementId);
+    }
 }

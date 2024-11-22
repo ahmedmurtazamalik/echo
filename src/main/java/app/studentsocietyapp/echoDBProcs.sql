@@ -313,4 +313,41 @@ BEGIN
     DELETE FROM Announcement WHERE announcement_id = p_announcement_id;
 END$$
 
+CREATE PROCEDURE CreatePostComment(
+    IN p_comment_id INT,
+    IN p_student_id INT,
+    IN p_post_id INT,
+    IN p_content TEXT,
+    IN p_name VARCHAR(255),
+    IN p_date DATETIME
+)
+BEGIN
+    INSERT INTO Comment (student_id, name, content, date)
+    VALUES (p_student_id, p_name, p_content, p_date);
+
+    SET p_comment_id = LAST_INSERT_ID();
+
+    INSERT INTO PostComment (post_id, comment_id)
+    VALUES (p_post_id, p_comment_id);
+END $$
+
+CREATE PROCEDURE CreateAnnouncementComment(
+    IN p_comment_id INT,
+    IN p_student_id INT,
+    IN p_announcement_id INT,
+    IN p_content TEXT,
+    IN p_name VARCHAR(255),
+    IN p_date DATETIME
+)
+BEGIN
+    INSERT INTO Comment (student_id, name, content, date)
+    VALUES (p_student_id, p_name, p_content, p_date);
+
+    SET p_comment_id = LAST_INSERT_ID();
+
+    INSERT INTO AnnouncementComment (announcement_id, comment_id)
+    VALUES (p_announcement_id, p_comment_id);
+
+END $$
+
 DELIMITER ;

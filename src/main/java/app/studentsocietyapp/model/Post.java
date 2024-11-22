@@ -37,4 +37,9 @@ public class Post {
 
     public String getAccountName() { return accountName; }
     public void setAccountName(String accountName) { this.accountName = accountName; }
+
+    @Override
+    public String toString() {
+        return String.valueOf(postId);
+    }
 }

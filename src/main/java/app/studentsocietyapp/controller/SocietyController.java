@@ -16,6 +16,7 @@ import javafx.scene.layout.HBox;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class SocietyController {
 
@@ -230,7 +231,7 @@ public class SocietyController {
     private Button switchToAnnouncementsButton;
 
     @FXML
-    private TableView<?> announcementsTable;
+    private TableView<Announcement> announcementsTable;
 
     @FXML
     private TableColumn<?,?> announcementIDColumn;
@@ -245,7 +246,7 @@ public class SocietyController {
     private TableColumn<?,?> announcementDescriptionColumn;
 
     @FXML
-    private TableView<?> postsTable;
+    private TableView<Post> postsTable;
 
     @FXML
     private TableColumn<?,?> postIDColumn;
@@ -259,12 +260,34 @@ public class SocietyController {
     @FXML
     private TableColumn<?,?> postDescriptionColumn;
 
+    @FXML
+    private AnchorPane homeAnnouncements;
+
+    @FXML
+    private AnchorPane homePosts;
+
     private SQLHandler sqlHandler;
     private Society society;
 
     @FXML
     public void initialize() throws SQLException {
         this.setSqlHandler();
+        announcementsTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Announcement selectedAnnouncement = (Announcement) announcementsTable.getSelectionModel().getSelectedItem();
+                if (selectedAnnouncement != null) {
+                    openAnnouncementComments(selectedAnnouncement);
+                }
+            }
+        });
+        postsTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Post selectedPost = postsTable.getSelectionModel().getSelectedItem();
+                if (selectedPost != null) {
+                    openPostComments(selectedPost);
+                }
+            }
+        });
     }
 
     private void setSqlHandler() {
@@ -276,7 +299,6 @@ public class SocietyController {
         updateProfileLabels();
         initializeTables();
         ArrayList<String> rolesList= new ArrayList<>();
-        //rolesList.add("President");
         rolesList.add("VP");
         rolesList.add("Secretary");
         rolesList.add("Head");
@@ -303,8 +325,6 @@ public class SocietyController {
 
     @FXML
     void enableEditForm(ActionEvent event) {
-        // Inside the profilePane, make the displayInfo VBox and the editButton button invisible.
-        // In turn, make the editForm VBox visible and the saveButton button visible.
         editButton.setVisible(false);
         displayInfo.setVisible(false);
         editForm.setVisible(true);
@@ -345,7 +365,6 @@ public class SocietyController {
             }
         });
 
-        // Display only the name in the ComboBox's selected value
         comboBox.setButtonCell(new ListCell<>() {
             @Override
             protected void updateItem(Student student, boolean empty) {
@@ -359,7 +378,12 @@ public class SocietyController {
         });
     }
 
-    void initializeTables() {
+    private void initializeTables() {
+        // Fetch posts and announcements data
+        ArrayList<Announcement> announcements = sqlHandler.getAllAnnouncements();
+        ArrayList<Post> posts = sqlHandler.getAllPosts();
+
+        // Fetch society members and their corresponding student details
         ArrayList<SocietyMember> members = sqlHandler.getSocietyMembers(society);
         ArrayList<Student> students = new ArrayList<>();
 
@@ -371,27 +395,28 @@ public class SocietyController {
             e.printStackTrace();
         }
 
-        // Create observable lists for both tables
+        // Create observable lists for all table data
         ObservableList<SocietyMemberRow> tableData = FXCollections.observableArrayList();
         ObservableList<SocietyMemberRow> membersListData = FXCollections.observableArrayList();
+        ObservableList<Post> postsData = FXCollections.observableArrayList(posts);
+        ObservableList<Announcement> announcementsData = FXCollections.observableArrayList(announcements);
 
         // Observable lists for combo boxes
         ObservableList<Student> removeMemberList = FXCollections.observableArrayList();
         ObservableList<Student> selectMemberList = FXCollections.observableArrayList();
         ObservableList<Student> approveMemberList = FXCollections.observableArrayList();
 
-        // Populate both tables using member and student information
+        // Populate society members and combo box data
         for (int i = 0; i < members.size(); i++) {
             SocietyMember member = members.get(i);
             Student student = students.get(i);
+
             SocietyMemberRow row = new SocietyMemberRow(student.getName(), member.getRole(), member.getStatus());
             tableData.add(row);
 
-            // Only add rows to membersListTable with role and name
             SocietyMemberRow listRow = new SocietyMemberRow(student.getName(), member.getRole(), null);
             membersListData.add(listRow);
 
-            // Populate combo boxes based on roles and statuses
             if (member.getStatus().equalsIgnoreCase("Approved")) {
                 if (!member.getRole().equalsIgnoreCase("President")) {
                     removeMemberList.add(student);
@@ -402,17 +427,37 @@ public class SocietyController {
             }
         }
 
-        // Bind the societyMembersTable columns
+        // Bind columns for postsTable
+        postIDColumn.setCellValueFactory(new PropertyValueFactory<>("postId"));
+        postDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        postByColumn.setCellValueFactory(new PropertyValueFactory<>("accountName"));
+        postDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("title")); // Short description
+
+        // Set postsTable data
+        postsTable.setItems(postsData);
+
+        // Bind columns for announcementsTable
+        announcementIDColumn.setCellValueFactory(new PropertyValueFactory<>("announcementId"));
+        announcementDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        announcementByColumn.setCellValueFactory(new PropertyValueFactory<>("societyName"));
+        announcementDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("title")); // Short description
+
+        // Set announcementsTable data
+        announcementsTable.setItems(announcementsData);
+
+        // Bind columns for societyMembersTable
         memberNameColumn.setCellValueFactory(new PropertyValueFactory<>("memberName"));
         memberRoleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
         approvalStatusColumn.setCellValueFactory(new PropertyValueFactory<>("approvalStatus"));
 
-        // Bind the membersListTable columns
+        // Set societyMembersTable data
+        societyMembersTable.setItems(tableData);
+
+        // Bind columns for membersListTable
         memberNameColumn1.setCellValueFactory(new PropertyValueFactory<>("memberName"));
         memberRoleColumn1.setCellValueFactory(new PropertyValueFactory<>("role"));
 
-        // Set the table data
-        societyMembersTable.setItems(tableData);
+        // Set membersListTable data
         membersListTable.setItems(membersListData);
 
         // Set combo box data
@@ -448,6 +493,7 @@ public class SocietyController {
         alert.setContentText("Your post has been successfully created.");
         alert.showAndWait();
 
+        initializeTables();
         postTitleField.clear();
         postContentArea.clear();
     }
@@ -475,10 +521,10 @@ public class SocietyController {
         alert.setContentText("Your announcement has been successfully created.");
         alert.showAndWait();
 
+        initializeTables();
         announcementTitleField.clear();
         announcementContentArea.clear();
     }
-
 
     @FXML
     void removeMember(ActionEvent event) {
@@ -515,6 +561,7 @@ public class SocietyController {
     void organizeEvent (ActionEvent event) {
         // Fetch the data from eventNameField, eventDatePicker, eventStartTimeField, eventEndTimeField, eventDescriptionArea.
         // Make relevant entry in Event table.
+        String eventName = eventNameField.getText();
     }
 
     @FXML
@@ -530,35 +577,56 @@ public class SocietyController {
         System.out.println("Student has been approved and role updated.");
     }
 
-    /*
-    {
+    private void openAnnouncementComments(Announcement announcement) {
+        ArrayList<Comment> comments = sqlHandler.getCommentsForAnnouncement(announcement.getAnnouncementId());
 
-      A function that fires each time a cell inside the postsTable is clicked.
-      It will retrieve the ID of the post that was clicked. IDs are supposed to be stored in first cell of each row.
-      Using that ID, other information about the post will be retrieved.
-      An information type alert will be sent that shows all the data of the post.
-      Basically, this serves as a "view entire post" thing.
+        StringBuilder commentsContent = new StringBuilder();
+        if (comments.isEmpty()) {
+            commentsContent.append("No comments available for this announcement.");
+        } else {
+            commentsContent.append("Comments:\n\n");
+            for (int i = 0; i < comments.size(); i++) {
+                commentsContent.append(i + 1).append(". ").append(comments.get(i).getContent()).append("\n");
+            }
+        }
 
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Comments for Announcement");
+        alert.setHeaderText("Announcement: " + announcement.getTitle());
+        alert.setContentText(commentsContent.toString());
+        alert.showAndWait();
     }
-    */
 
+    private void openPostComments(Post selectedPost) {
+        ArrayList<Comment> comments = sqlHandler.getCommentsForPost(selectedPost.getPostId());
 
-    /*
-    {
+        StringBuilder commentsContent = new StringBuilder();
+        if (comments.isEmpty()) {
+            commentsContent.append("No comments available for this Post.");
+        } else {
+            commentsContent.append("Comments:\n\n");
+            for (int i = 0; i < comments.size(); i++) {
+                commentsContent.append(i + 1).append(". ").append(comments.get(i).getContent()).append("\n");
+            }
+        }
 
-        Same thing but for announcements table.
-
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Comments for Post");
+        alert.setHeaderText("Announcement: " + selectedPost.getTitle());
+        alert.setContentText(commentsContent.toString());
+        alert.showAndWait();
     }
-    */
 
     @FXML
     void switchToPosts(ActionEvent event) {
-        //homePosts = visible, homeAnnouncements = invisible
+        homeAnnouncements.setVisible(false);
+        homePosts.setVisible(true);
     }
 
     @FXML
     void switchToAnnouncements(ActionEvent event) {
-        // vice versa
+        homeAnnouncements.setVisible(true);
+        homePosts.setVisible(false);
     }
 
     @FXML

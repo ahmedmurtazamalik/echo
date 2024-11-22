@@ -74,9 +74,124 @@
                <children>
                   <StackPane fx:id="contentStackPane" layoutX="-14.0" prefWidth="741.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane fx:id="homePane" managed="true" prefHeight="483.0" prefWidth="710.0" visible="false">
+                        <AnchorPane fx:id="homePane" managed="true" prefHeight="483.0" prefWidth="710.0">
                            <children>
-                              <Label text="Home Content" />
+                              <StackPane prefHeight="527.2" prefWidth="742.4">
+                                 <children>
+                                    <AnchorPane fx:id="homeAnnouncements" prefHeight="446.0" prefWidth="742.0" style="-fx-background-color: #E6F2FF;">
+                                       <children>
+                                          <HBox alignment="CENTER_RIGHT" prefHeight="66.0" prefWidth="742.0" style="-fx-background-color: #719dbf;">
+                                             <children>
+                                                <Label prefHeight="30.0" prefWidth="210.0" style="-fx-font-size: 20px; -fx-font-family: Segoe UI; -fx-font-weight: bold;" text="SOCIETY HOME FEED" />
+                                                <Region prefHeight="54.0" prefWidth="212.0" />
+                                                <VBox alignment="CENTER_RIGHT" prefHeight="54.0" prefWidth="299.0">
+                                                   <children>
+                                                      <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                                                         <children>
+                                                            <Label style="-fx-font-size: 14px; -fx-font-family: Segoe UI; -fx-font-weight: bold;" text="Currently Displaying Announcements">
+                                                               <padding>
+                                                                  <Insets right="10.0" />
+                                                               </padding>
+                                                            </Label>
+                                                         </children>
+                                                      </HBox>
+                                                      <HBox alignment="TOP_RIGHT" prefHeight="27.0" prefWidth="295.0">
+                                                         <children>
+                                                            <Button fx:id="switchToPostsButton" mnemonicParsing="false" onAction="#switchToPosts" prefHeight="23.0" prefWidth="103.0" style="-fx-background-color: #E6F2FF;" text="Switch to Posts">
+                                                               <HBox.margin>
+                                                                  <Insets bottom="5.0" right="10.0" />
+                                                               </HBox.margin>
+                                                            </Button>
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <VBox layoutY="66.0" prefHeight="462.0" prefWidth="734.0" style="-fx-background-color: #E6F2FF; -fx-padding: 20;">
+                                             <children>
+                                                <HBox alignment="CENTER" prefHeight="39.0" prefWidth="694.0">
+                                                   <children>
+                                                      <Label prefHeight="39.0" prefWidth="188.0" style="-fx-font-family: 'Segoe UI';" text="Announcements">
+                                                         <font>
+                                                            <Font name="Segoe UI Bold" size="24.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </HBox>
+                                                <TableView fx:id="announcementsTable" editable="true" prefHeight="389.0" prefWidth="694.0">
+                                                   <columns>
+                                                      <TableColumn fx:id="announcementIDColumn" prefWidth="46.40003776550293" text="ID" />
+                                                      <TableColumn fx:id="announcementDateColumn" prefWidth="95.99994659423828" text="Date" />
+                                                      <TableColumn fx:id="announcementByColumn" prefWidth="127.2000732421875" text="By" />
+                                                      <TableColumn fx:id="announcementDescriptionColumn" minWidth="0.0" prefWidth="607.9999389648438" text="Content" />
+                                                   </columns>
+                                                   <VBox.margin>
+                                                      <Insets left="25.0" />
+                                                   </VBox.margin>
+                                                </TableView>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane fx:id="homePosts" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #E6F2FF;" visible="false">
+                                       <children>
+                                          <HBox alignment="CENTER_RIGHT" prefHeight="66.0" prefWidth="742.0" style="-fx-background-color: #719dbf;">
+                                             <children>
+                                                <Label prefHeight="30.0" prefWidth="210.0" style="-fx-font-size: 20px; -fx-font-family: Segoe UI; -fx-font-weight: bold;" text="SOCIETY HOME FEED" />
+                                                <Region prefHeight="66.0" prefWidth="209.0" />
+                                                <VBox alignment="CENTER_RIGHT" prefHeight="54.0" prefWidth="299.0">
+                                                   <children>
+                                                      <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                                                         <children>
+                                                            <Label style="-fx-font-size: 14px; -fx-font-family: Segoe UI; -fx-font-weight: bold;" text="Currently Displaying Posts">
+                                                               <padding>
+                                                                  <Insets right="10.0" />
+                                                               </padding>
+                                                            </Label>
+                                                         </children>
+                                                      </HBox>
+                                                      <HBox alignment="TOP_RIGHT" prefHeight="27.0" prefWidth="295.0">
+                                                         <children>
+                                                            <Button fx:id="switchToAnnouncementsButton" mnemonicParsing="false" onAction="#switchToAnnouncements" prefHeight="23.0" prefWidth="162.0" style="-fx-background-color: #E6F2FF;" text="Switch to Announcements">
+                                                               <HBox.margin>
+                                                                  <Insets bottom="5.0" right="10.0" />
+                                                               </HBox.margin>
+                                                            </Button>
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <VBox layoutY="66.0" prefHeight="460.0" prefWidth="734.0" style="-fx-background-color: #E6F2FF; -fx-padding: 20;">
+                                             <children>
+                                                <HBox alignment="CENTER" prefHeight="39.0" prefWidth="694.0">
+                                                   <children>
+                                                      <Label prefHeight="39.0" prefWidth="61.0" style="-fx-font-family: 'Segoe UI';" text="Posts">
+                                                         <font>
+                                                            <Font name="Segoe UI Bold" size="24.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                </HBox>
+                                                <TableView fx:id="postsTable" editable="true" prefHeight="385.0" prefWidth="694.0">
+                                                   <columns>
+                                                      <TableColumn fx:id="postIDColumn" prefWidth="55.20002555847168" text="ID" />
+                                                      <TableColumn fx:id="postDateColumn" prefWidth="125.59998321533203" text="Date" />
+                                                      <TableColumn fx:id="postByColumn" prefWidth="139.20001220703125" text="By" />
+                                                      <TableColumn fx:id="postDescriptionColumn" minWidth="0.0" prefWidth="557.6000671386719" text="Description" />
+                                                   </columns>
+                                                   <VBox.margin>
+                                                      <Insets left="20.0" />
+                                                   </VBox.margin>
+                                                </TableView>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                              </StackPane>
                            </children>
                         </AnchorPane>
                         <AnchorPane fx:id="notificationsPane" managed="true" prefHeight="483.0" prefWidth="758.0" visible="false">
