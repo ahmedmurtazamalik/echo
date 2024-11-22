@@ -185,27 +185,40 @@ public class AdminController {
     void showAddSocietyPane(ActionEvent event) {
         // addSocietyPane = visible
         // addVenuePane, manageEventsPane, manageSocietiesPane = invisible
+        addSocietyPane.setVisible(true);
+        manageEventsPane.setVisible(false);
+        addVenuePane.setVisible(false);
+        manageSocietiesPane.setVisible(false);
     }
 
     @FXML
     void showAddVenuePane(ActionEvent event) {
         // addVenuePane = visible
         // addSocietyPane, manageEventsPane, manageSocietiesPane = invisible
-
+        addVenuePane.setVisible(true);
+        manageEventsPane.setVisible(false);
+        addSocietyPane.setVisible(false);
+        manageSocietiesPane.setVisible(false);
     }
 
     @FXML
     void showManageEventsPane(ActionEvent event) {
         // manageEventsPane = visible
         // addVenuePane, addSocietyPane, manageSocietiesPane = invisible
-
+        manageEventsPane.setVisible(true);
+        addVenuePane.setVisible(false);
+        addSocietyPane.setVisible(false);
+        manageSocietiesPane.setVisible(false);
     }
 
     @FXML
     void showManageSocietiesPane(ActionEvent event) {
         // manageSocietiesPane = visible
         // addVenuePane, manageEventsPane, addSocietyPane = invisible
-
+        manageSocietiesPane.setVisible(true);
+        manageEventsPane.setVisible(false);
+        addVenuePane.setVisible(false);
+        addSocietyPane.setVisible(false);
     }
 
 }

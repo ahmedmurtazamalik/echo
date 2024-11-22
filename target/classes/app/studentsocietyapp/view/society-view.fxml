@@ -74,7 +74,7 @@
                <children>
                   <StackPane fx:id="contentStackPane" layoutX="-14.0" prefWidth="741.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane fx:id="homePane" managed="true" prefHeight="483.0" prefWidth="710.0">
+                        <AnchorPane fx:id="homePane" managed="true" prefHeight="483.0" prefWidth="710.0" visible="false">
                            <children>
                               <StackPane prefHeight="527.2" prefWidth="742.4">
                                  <children>
@@ -244,8 +244,8 @@
                                  <children>
                                     <TextField fx:id="eventNameField" promptText="Event Name" />
                                     <DatePicker fx:id="eventDatePicker" prefHeight="31.0" prefWidth="305.0" promptText="Event Date" />
-                                    <TextField fx:id="eventStartTimeField" promptText="Event Start Time" />
-                                    <TextField fx:id="eventEndTimeField" editable="false" promptText="Event End Time" />
+                                    <TextField fx:id="eventStartTimeField" promptText="Event Start Time [HH:MI:SS]" />
+                                    <TextField fx:id="eventEndTimeField" promptText="Event End Time [HH:MI:SS]" />
                                     <TextArea fx:id="eventDescriptionArea" prefHeight="200.0" prefWidth="200.0" promptText="Event Description" />
                                     <ComboBox fx:id="eventVenueComboBox" prefHeight="24.0" prefWidth="302.0" promptText="Event Venue" />
                                  </children>

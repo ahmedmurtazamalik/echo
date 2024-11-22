@@ -1,0 +1,14 @@
+What I did (or tried to)
+
+0. Added 5 venues in the venue table
+
+1. Made a getVenues function in SQLHandler that returns all the entries of Venue table
+
+2. In SocietyController, added the venue objects in eventVenueComboBox (all the observable list stuff)
+Full objects of Venue showing up rn, couldn't figure out how to set the combobox display as venue name only
+
+3. Made a createEvent function in SQLHandler that uses the CreateEvent stored procedure from echoDBProcs
+(Issue is in here according to my estimation, something to do with society id being used in the stored procedure instead of account id)
+
+4. In the organizeEvent function in SocietyController, gathered all the entered data and used the createEvent function which I made in SQLHandler
+Sent alert for invalid input

@@ -1,2 +1,0 @@
-To do: whatever implementation/fixing is left in student and society views.
-Basically all functionality except for the Home Feeds as I haven't made home feed UI yet.

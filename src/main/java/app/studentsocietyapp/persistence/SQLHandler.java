@@ -3,13 +3,15 @@ package app.studentsocietyapp.persistence;
 import app.studentsocietyapp.model.*;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class SQLHandler extends PersistenceHandler {
 
     private static final String connectionString = "jdbc:mysql://localhost:3306/echodb";
     private static final String username = "root";
-    private static final String password = "Inazuma11";
+    private static final String password = "03230";
 
     private static SQLHandler instance = null;
 
@@ -428,6 +430,30 @@ public class SQLHandler extends PersistenceHandler {
         return members;
     }
 
+    public ArrayList<Venue> getVenues() {
+        ArrayList<Venue> venues = new ArrayList<>();
+        String query = "SELECT * FROM Venue";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int venueId = rs.getInt("venue_id");
+                String venueName = rs.getString("venue_name");
+                String location = rs.getString("location");
+
+                Venue venue = new Venue(venueId, venueName, location);
+                venues.add(venue);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return venues;
+    }
+
+
     public void approveStudent(int studentId, int societyId) {
         String query = "UPDATE SocietyMember SET status = 'Approved', role = 'Member' WHERE student_id = ? AND society_id = ?";
         try (Connection conn = getConnection();
@@ -478,6 +504,45 @@ public class SQLHandler extends PersistenceHandler {
             stmt.setString(2, name);
             stmt.setString(3, announcementTitle);
             stmt.setString(4, announcementContent);
+            stmt.execute();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Helper method to convert a time string ("HH:MM:SS") to Timestamp
+    private Timestamp convertStringToTimestamp(String timeString) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            java.util.Date parsedDate = sdf.parse(timeString);
+            return new Timestamp(parsedDate.getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Return null if there's an error parsing the time string
+        }
+    }
+
+    public void createEvent(int societyId, String eventName, String eventDescription, Venue venue, LocalDate eventDate,
+                            String startTimeString, String endTimeString) throws SQLException {
+        String query = "{CALL CreateEvent(?, ?, ?, ?, ?, ?, ?)}";
+
+        try (Connection conn = getConnection(); // Assuming getConnection() gives a valid connection
+             CallableStatement stmt = conn.prepareCall(query)) {
+
+            stmt.setInt(1, societyId);
+            stmt.setString(2, eventName);
+            stmt.setString(3, eventDescription);
+            stmt.setInt(4, venue.getVenueId());
+            stmt.setDate(5, java.sql.Date.valueOf(eventDate)); // Convert LocalDate to java.sql.Date
+
+            // Convert startTimeString and endTimeString to Timestamp
+            Timestamp startTime = convertStringToTimestamp(startTimeString);
+            Timestamp endTime = convertStringToTimestamp(endTimeString);
+
+            stmt.setTimestamp(6, startTime); // `startTime` is a java.sql.Timestamp object
+            stmt.setTimestamp(7, endTime); // `endTime` is a java.sql.Timestamp object
+
             stmt.execute();
         }
         catch (SQLException e) {
