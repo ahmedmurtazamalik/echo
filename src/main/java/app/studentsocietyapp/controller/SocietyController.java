@@ -573,7 +573,6 @@ public class SocietyController {
         String eventDescription = eventDescriptionArea.getText();
         Venue eventVenue = (Venue) eventVenueComboBox.getSelectionModel().getSelectedItem();
 
-
         if (eventName.isEmpty() || eventDate.toString().isEmpty() || eventStartTime.isEmpty() || eventEndTime.isEmpty() || eventDescription.isEmpty() || eventVenue == null ) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Invalid Input");
@@ -583,7 +582,7 @@ public class SocietyController {
             return;
         }
 
-        sqlHandler.createEvent(society.getAccountId(), eventName, eventDescription, eventVenue, eventDate, eventStartTime, eventEndTime);
+        sqlHandler.createEvent(society.getSocietyId(), eventName, eventDescription, eventVenue, eventDate, eventStartTime, eventEndTime);
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Event Created");

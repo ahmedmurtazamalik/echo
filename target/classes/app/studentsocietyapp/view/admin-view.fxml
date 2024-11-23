@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefWidth="800" stylesheets="@societyview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AdminController">
+<BorderPane prefWidth="800" stylesheets="@societyview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.studentsocietyapp.controller.AdminController">
    <top>
       <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #4A90E2; -fx-padding: 10;">
          <children>
@@ -55,7 +55,7 @@
                               <Button fx:id="addSocietyButton" onAction="#showAddSocietyPane" styleClass="dashboard-button" text="Add a New Society" />
                               <Button fx:id="manageEventsButton" mnemonicParsing="false" onAction="#showManageEventsPane" styleClass="dashboard-button" text="Manage Events" />
                               <Button fx:id="manageSocietiesButton" onAction="#showManageSocietiesPane" styleClass="dashboard-button" text="Manage Societies" />
-                              <Button fx:id="addVenueButton" onAction="#showAddVenuePane" prefWidth="156.0" style="-fx-font-size: ;" styleClass="dashboard-button" text="Add a New Venue" />
+                              <Button fx:id="addVenueButton" onAction="#showAddVenuePane" prefWidth="156.0" styleClass="dashboard-button" text="Add a New Venue" />
                            </children>
                         </VBox>
                      </children>
