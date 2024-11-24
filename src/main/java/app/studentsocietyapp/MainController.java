@@ -1,5 +1,6 @@
 package app.studentsocietyapp;
 
+import app.studentsocietyapp.controller.AdminController;
 import app.studentsocietyapp.controller.SocietyController;
 import app.studentsocietyapp.controller.StudentController;
 import app.studentsocietyapp.model.Society;
@@ -100,11 +101,14 @@ public class MainController {
                 }
             } else if (accountType == 2) {
                 Society society = sqlHandler.getSocietyDetails(accountID);
-                if (society != null) {
+                if (society != null && society.isApproved()) {
                     SocietyController societyController = loader.getController();
                     System.out.println("Society Name: " + society.getName());
                     societyController.setSocietyDetails(society);
                 }
+            } else if (accountType == 3) {
+                AdminController adminController = loader.getController();
+                System.out.println("Admin Woo");
             }
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

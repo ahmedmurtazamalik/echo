@@ -40,5 +40,10 @@ public class Student {
     public void setId(int studentId) {
         this.studentId = studentId;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
 

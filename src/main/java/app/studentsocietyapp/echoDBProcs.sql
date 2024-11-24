@@ -256,6 +256,16 @@ BEGIN
     DELETE FROM Post WHERE post_id = p_post_id;
 END$$
 
+-- ********** Venue Procedures **********
+CREATE PROCEDURE CreateVenue(
+    IN p_venue_name VARCHAR(100),
+    IN p_location TEXT
+)
+BEGIN
+    INSERT INTO Venue (venue_name, location)
+    VALUES (p_venue_name, p_location);
+END$$
+
 -- ********** Event Procedures **********
 CREATE PROCEDURE CreateEvent(
     IN p_society_id INT,

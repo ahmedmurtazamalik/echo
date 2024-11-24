@@ -15,6 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -272,6 +274,10 @@ public class SocietyController {
     @FXML
     public void initialize() throws SQLException {
         this.setSqlHandler();
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+        String formattedDate = currentDate.format(formatter);
+        dateLabel.setText(formattedDate);
         announcementsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Announcement selectedAnnouncement = (Announcement) announcementsTable.getSelectionModel().getSelectedItem();
@@ -385,6 +391,7 @@ public class SocietyController {
 
         // Fetch society members and their corresponding student details
         ArrayList<SocietyMember> members = sqlHandler.getSocietyMembers(society);
+        ArrayList<Venue> venues = sqlHandler.getVenues();
         ArrayList<Student> students = new ArrayList<>();
 
         try {
@@ -405,6 +412,9 @@ public class SocietyController {
         ObservableList<Student> removeMemberList = FXCollections.observableArrayList();
         ObservableList<Student> selectMemberList = FXCollections.observableArrayList();
         ObservableList<Student> approveMemberList = FXCollections.observableArrayList();
+        ObservableList<Venue> venuesList = FXCollections.observableArrayList(venues);
+
+        eventVenueComboBox.setItems(venuesList);
 
         // Populate society members and combo box data
         for (int i = 0; i < members.size(); i++) {
@@ -558,10 +568,39 @@ public class SocietyController {
     }
 
     @FXML
-    void organizeEvent (ActionEvent event) {
+    void organizeEvent (ActionEvent event) throws SQLException {
         // Fetch the data from eventNameField, eventDatePicker, eventStartTimeField, eventEndTimeField, eventDescriptionArea.
         // Make relevant entry in Event table.
         String eventName = eventNameField.getText();
+        LocalDate eventDate = eventDatePicker.getValue();
+        String eventStartTime = eventStartTimeField.getText();
+        String eventEndTime = eventEndTimeField.getText();
+        String eventDescription = eventDescriptionArea.getText();
+        Venue eventVenue = (Venue) eventVenueComboBox.getSelectionModel().getSelectedItem();
+
+        if (eventName.isEmpty() || eventDate.toString().isEmpty() || eventStartTime.isEmpty() || eventEndTime.isEmpty() || eventDescription.isEmpty() || eventVenue == null ) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("Cannot send event for approval.");
+            alert.setContentText("Please make sure every field is properly filled and follows the format.");
+            alert.showAndWait();
+            return;
+        }
+
+        sqlHandler.createEvent(society.getSocietyId(), eventName, eventDescription, eventVenue, eventDate, eventStartTime, eventEndTime);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Event Created");
+        alert.setHeaderText("Success");
+        alert.setContentText("Event has been successfully submitted for approval.");
+        alert.showAndWait();
+
+        initializeTables();
+        eventNameField.clear();
+        eventStartTimeField.clear();
+        eventEndTimeField.clear();
+        eventDescriptionArea.clear();
+
     }
 
     @FXML

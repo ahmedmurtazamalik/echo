@@ -247,6 +247,10 @@ public class StudentController {
     @FXML
     public void initialize() throws SQLException {
         this.setSqlHandler();
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+        String formattedDate = currentDate.format(formatter);
+        dateLabel.setText(formattedDate);
         announcementsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Announcement selectedAnnouncement = (Announcement) announcementsTable.getSelectionModel().getSelectedItem();
@@ -272,7 +276,6 @@ public class StudentController {
     public void setStudentDetails(Student student) throws SQLException {
         this.student = student;
         updateProfileLabels();
-        loadMySocieties();
         initializeTables();
     }
 
@@ -327,6 +330,12 @@ public class StudentController {
         // Set the prompt text for the ComboBoxes to indicate what they are for
         selectPostComboBox.setPromptText("Select Post ID");
         selectAnnouncementComboBox.setPromptText("Select Announcement ID");
+        try {
+            loadMySocieties();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateProfileLabels() throws SQLException {
@@ -415,13 +424,32 @@ public class StudentController {
         String comments = commentsField.getText();
 
         if (!societyName.isEmpty() && !role.isEmpty()) {
-            sqlHandler.applyToSociety(student.getStudentId(), societyName, role, comments);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText("Application submitted successfully!");
-            alert.show();
-            societyNameField.clear();
-            roleField.clear();
-            commentsField.clear();
+            Society society = sqlHandler.getSocietyByName(societyName);
+            if (society != null) {
+                if(society.isApproved()){
+                    sqlHandler.applyToSociety(student.getStudentId(), societyName, role, comments);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("Application submitted successfully!");
+                    alert.show();
+                    societyNameField.clear();
+                    roleField.clear();
+                    commentsField.clear();
+                }
+                else{
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Society is not approved");
+                    alert.show();
+                }
+            }
+            else{
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Society does not exist");
+                alert.show();
+            }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText("Please fill in all required fields.");
@@ -485,7 +513,6 @@ public class StudentController {
 
         System.out.println("Comment made on Announcement: " + selectedAnnouncement.getAnnouncementId());
     }
-
 
     @FXML
     void submitPostComment(ActionEvent event) {
@@ -587,7 +614,7 @@ public class StudentController {
 
                 if (role.getRole().equals("Member")) {
                     sqlHandler.removeFromSociety(student.getStudentId(), society.getSocietyId());
-                    loadMySocieties();
+                    initializeTables();
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setContentText("Successfully left the society.");
                     alert.show();
@@ -607,7 +634,7 @@ public class StudentController {
         String selectedSociety = societylistComboBox.getValue();
         Society society = sqlHandler.getSocietyByName(selectedSociety);
         sqlHandler.relinquishRoleInSociety(student.getStudentId(), society.getSocietyId());
-        loadMySocieties();
+        initializeTables();
         relinquishroleBox.setVisible(false);
         leavesocietyBox.setVisible(true);
     }

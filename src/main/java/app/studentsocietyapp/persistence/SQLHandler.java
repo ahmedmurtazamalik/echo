@@ -1,15 +1,21 @@
 package app.studentsocietyapp.persistence;
 
 import app.studentsocietyapp.model.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SQLHandler extends PersistenceHandler {
 
     private static final String connectionString = "jdbc:mysql://localhost:3306/echodb";
     private static final String username = "root";
-    private static final String password = "Inazuma11";
+    private static final String password = "";
 
     private static SQLHandler instance = null;
 
@@ -254,6 +260,8 @@ public class SQLHandler extends PersistenceHandler {
         return societyRole;
     }
 
+
+
     public void applyToSociety(int studentId, String societyName, String role, String comments) throws SQLException {
         // Step 1: Get the society_id using the GetAllSocieties procedure
         String getSocietyIdQuery = "{CALL GetAllSocieties()}";
@@ -344,6 +352,32 @@ public class SQLHandler extends PersistenceHandler {
         return null;
     }
 
+    public Society getSocietyById(int societyId) throws SQLException {
+        String query = "SELECT * FROM Society WHERE society_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, societyId);  // Set the society name parameter
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // If a society with the given id exists, create and return the Society object
+                    return new Society(
+                            rs.getInt("society_id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getInt("members"),
+                            rs.getString("description"),
+                            rs.getBoolean("isApproved"),
+                            rs.getInt("account_id")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
     public void updateStudentDetails(Student student) throws SQLException {
         String query = "UPDATE Student SET name = ?, email = ?, batch = ?, rollnumber = ?, phone = ? WHERE student_id = ?";
         try (Connection conn = getConnection();
@@ -403,6 +437,7 @@ public class SQLHandler extends PersistenceHandler {
         }
     }
 
+
     public ArrayList<SocietyMember> getSocietyMembers(Society society) {
         ArrayList<SocietyMember> members = new ArrayList<>();
         String query = "SELECT * FROM SocietyMember WHERE society_id = ?";
@@ -426,6 +461,110 @@ public class SQLHandler extends PersistenceHandler {
         }
 
         return members;
+    }
+
+    public ArrayList<Society> getPendingSocieties() throws SQLException {
+        String query = "SELECT * FROM Society where isApproved = 0";
+        ArrayList<Society> societies = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Create a Society object for each row and add it to the list
+                Society society = new Society(
+                        rs.getInt("society_id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getInt("members"),
+                        rs.getString("description"),
+                        rs.getBoolean("isApproved"),
+                        rs.getInt("account_id")
+                );
+                societies.add(society);
+            }
+        }
+
+        return societies;  // Return the list of societies
+    }
+
+    public ArrayList<Event> getPendingEvents() throws SQLException {
+        String query = "SELECT * FROM Event where approvalStatus = 'Pending'";
+        ArrayList<Event> events = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Create an Event object for each row and add it to the list
+                Event event = new Event(
+                        rs.getInt("event_id"),
+                        rs.getInt("society_id"),
+                        rs.getString("event_name"),
+                        rs.getString("event_description"),
+                        rs.getInt("venue_id"),
+                        rs.getDate("date"),
+                        rs.getTimestamp("start_time"),
+                        rs.getTimestamp("end_time"),
+                        rs.getString("approvalStatus")
+                );
+                events.add(event);
+            }
+        }
+
+        return events;  // Return the list of events
+    }
+
+
+    public ArrayList<Society> getApprovedSocieties() throws SQLException {
+        String query = "SELECT * FROM Society where isApproved = 1";
+        ArrayList<Society> societies = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Create a Society object for each row and add it to the list
+                Society society = new Society(
+                        rs.getInt("society_id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getInt("members"),
+                        rs.getString("description"),
+                        rs.getBoolean("isApproved"),
+                        rs.getInt("account_id")
+                );
+                societies.add(society);
+            }
+        }
+
+        return societies;  // Return the list of societies
+    }
+
+    public ArrayList<Venue> getVenues() {
+        ArrayList<Venue> venues = new ArrayList<>();
+        String query = "SELECT * FROM Venue";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int venueId = rs.getInt("venue_id");
+                String venueName = rs.getString("venue_name");
+                String location = rs.getString("location");
+
+                Venue venue = new Venue(venueId, venueName, location);
+                venues.add(venue);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return venues;
     }
 
     public void approveStudent(int studentId, int societyId) {
@@ -470,6 +609,43 @@ public class SQLHandler extends PersistenceHandler {
         }
     }
 
+    public void createSociety(String username, String password, int accountType, String societyName, String societyEmail, int members, String societyDescription, int isApproved) {
+        String query = "CALL CreateSociety(?, ?, ?, ?, ?, ?, ?, ?)";
+        try(Connection conn = getConnection();
+            CallableStatement stmt = conn.prepareCall(query)){
+            stmt.setString(1, username);          // p_username
+            stmt.setString(2, password);          // p_password
+            stmt.setInt(3, accountType);       // p_accountType
+            stmt.setString(4, societyName);       // p_name
+            stmt.setString(5, societyEmail);      // p_email
+            stmt.setInt(6, members);              // p_members
+            stmt.setString(7, societyDescription); // p_description
+            stmt.setInt(8, isApproved);           // p_isApproved
+            stmt.execute();
+            System.out.println("Society profile created successfully. Pending approval.");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createVenue(String venueName, String location) {
+        String query = "CALL CreateVenue(?, ?)";
+        try (Connection conn = getConnection();
+             CallableStatement stmt = conn.prepareCall(query)) {
+            // Set the input parameters for the procedure
+            stmt.setString(1, venueName); // p_venue_name
+            stmt.setString(2, location); // p_location
+
+            // Execute the procedure
+            stmt.execute();
+            System.out.println("Venue added successfully.");
+        } catch (SQLException e) {
+            // Handle SQL exceptions
+            e.printStackTrace();
+        }
+    }
+
     public void createAnnouncement(int societyId, String name, String announcementTitle, String announcementContent) {
         String query = "CALL CreateAnnouncement (?, ?, ?, ?)";
         try(Connection conn = getConnection();
@@ -478,6 +654,45 @@ public class SQLHandler extends PersistenceHandler {
             stmt.setString(2, name);
             stmt.setString(3, announcementTitle);
             stmt.setString(4, announcementContent);
+            stmt.execute();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Helper method to convert a time string ("HH:MM:SS") to Timestamp
+    private Timestamp convertStringToTimestamp(String timeString) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            java.util.Date parsedDate = sdf.parse(timeString);
+            return new Timestamp(parsedDate.getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Return null if there's an error parsing the time string
+        }
+    }
+
+    public void createEvent(int societyId, String eventName, String eventDescription, Venue venue, LocalDate eventDate,
+                            String startTimeString, String endTimeString) throws SQLException {
+        String query = "{CALL CreateEvent(?, ?, ?, ?, ?, ?, ?)}";
+
+        try (Connection conn = getConnection(); // Assuming getConnection() gives a valid connection
+             CallableStatement stmt = conn.prepareCall(query)) {
+
+            stmt.setInt(1, societyId);
+            stmt.setString(2, eventName);
+            stmt.setString(3, eventDescription);
+            stmt.setInt(4, venue.getVenueId());
+            stmt.setDate(5, java.sql.Date.valueOf(eventDate)); // Convert LocalDate to java.sql.Date
+
+            // Convert startTimeString and endTimeString to Timestamp
+            Timestamp startTime = convertStringToTimestamp(startTimeString);
+            Timestamp endTime = convertStringToTimestamp(endTimeString);
+
+            stmt.setTimestamp(6, startTime); // `startTime` is a java.sql.Timestamp object
+            stmt.setTimestamp(7, endTime); // `endTime` is a java.sql.Timestamp object
+
             stmt.execute();
         }
         catch (SQLException e) {
@@ -575,6 +790,169 @@ public class SQLHandler extends PersistenceHandler {
         }
 
         return announcements;
+    }
+
+    public void approveSociety(int societyId) {
+        String query = "UPDATE Society SET isApproved = 1 WHERE society_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, societyId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Society with ID " + societyId + " has been approved.");
+            } else {
+                System.out.println("No society found with ID " + societyId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeSociety(int societyId) {
+        String query = "UPDATE Society SET isApproved = 0 WHERE society_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, societyId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Society with ID " + societyId + " has been removed.");
+            } else {
+                System.out.println("No society found with ID " + societyId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeVenue(int venueId) {
+        String query = "DELETE from Venue WHERE venue_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, venueId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Venue with ID " + venueId + " has been removed.");
+            } else {
+                System.out.println("No venue found with ID " + venueId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void approveEvent(int eventId) {
+        String query = "UPDATE Event SET approvalStatus = 'Approved' WHERE event_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, eventId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Event with ID " + eventId + " has been approved.");
+            } else {
+                System.out.println("No event found with ID " + eventId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void rejectEvent(int eventId) {
+        String query = "UPDATE Event SET approvalStatus = 'Rejected' WHERE event_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, eventId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Event with ID " + eventId + " has been rejected.");
+            } else {
+                System.out.println("No event found with ID " + eventId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<Society> getAllSocieties() {
+        ArrayList<Society> societies = new ArrayList<>();
+        String query = "SELECT * FROM Society";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int societyId = resultSet.getInt("society_id");
+                String societyName = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                int members = resultSet.getInt("members");
+                String description = resultSet.getString("description");
+                boolean isApproved = resultSet.getBoolean("isApproved");
+                int accountId = resultSet.getInt("account_id");
+
+                Society society = new Society(societyId, societyName, email, members, description, isApproved, accountId);
+                societies.add(society);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return societies;
+    }
+
+    public ArrayList<Event> getAllEvents() {
+        ArrayList<Event> events = new ArrayList<>();
+        String query = "SELECT * FROM Event";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int eventId = resultSet.getInt("event_id");
+                int societyId = resultSet.getInt("society_id");
+                String eventName = resultSet.getString("event_name");
+                String eventDescription = resultSet.getString("event_description");
+                int venueId = resultSet.getInt("venue_id");
+                Date date = resultSet.getDate("date");
+                Timestamp startTime = resultSet.getTimestamp("start_time");
+                Timestamp endTime = resultSet.getTimestamp("end_time");
+                String approvalStatus = resultSet.getString("approvalStatus");
+
+                Event event = new Event(eventId, societyId, eventName, eventDescription, venueId, date, startTime, endTime, approvalStatus);
+                events.add(event);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return events;
     }
 
     public void makeAnnouncementComment(int studentId, int announcementId, String name, String commentText) {
