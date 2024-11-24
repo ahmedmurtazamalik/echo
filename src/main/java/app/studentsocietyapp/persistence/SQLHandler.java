@@ -352,6 +352,32 @@ public class SQLHandler extends PersistenceHandler {
         return null;
     }
 
+    public Society getSocietyById(int societyId) throws SQLException {
+        String query = "SELECT * FROM Society WHERE society_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, societyId);  // Set the society name parameter
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // If a society with the given id exists, create and return the Society object
+                    return new Society(
+                            rs.getInt("society_id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getInt("members"),
+                            rs.getString("description"),
+                            rs.getBoolean("isApproved"),
+                            rs.getInt("account_id")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
     public void updateStudentDetails(Student student) throws SQLException {
         String query = "UPDATE Student SET name = ?, email = ?, batch = ?, rollnumber = ?, phone = ? WHERE student_id = ?";
         try (Connection conn = getConnection();
@@ -464,7 +490,7 @@ public class SQLHandler extends PersistenceHandler {
     }
 
     public ArrayList<Event> getPendingEvents() throws SQLException {
-        String query = "SELECT e.* FROM Event e INNER JOIN EventScheduled es ON e.event_id = es.event_id WHERE es.event_id IS NULL";
+        String query = "SELECT * FROM Event where approvalStatus = 'Pending'";
         ArrayList<Event> events = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -481,7 +507,8 @@ public class SQLHandler extends PersistenceHandler {
                         rs.getInt("venue_id"),
                         rs.getDate("date"),
                         rs.getTimestamp("start_time"),
-                        rs.getTimestamp("end_time")
+                        rs.getTimestamp("end_time"),
+                        rs.getString("approvalStatus")
                 );
                 events.add(event);
             }
@@ -539,7 +566,6 @@ public class SQLHandler extends PersistenceHandler {
 
         return venues;
     }
-
 
     public void approveStudent(int studentId, int societyId) {
         String query = "UPDATE SocietyMember SET status = 'Approved', role = 'Member' WHERE student_id = ? AND society_id = ?";
@@ -808,6 +834,69 @@ public class SQLHandler extends PersistenceHandler {
         }
     }
 
+    public void removeVenue(int venueId) {
+        String query = "DELETE from Venue WHERE venue_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, venueId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Venue with ID " + venueId + " has been removed.");
+            } else {
+                System.out.println("No venue found with ID " + venueId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void approveEvent(int eventId) {
+        String query = "UPDATE Event SET approvalStatus = 'Approved' WHERE event_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, eventId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Event with ID " + eventId + " has been approved.");
+            } else {
+                System.out.println("No event found with ID " + eventId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void rejectEvent(int eventId) {
+        String query = "UPDATE Event SET approvalStatus = 'Rejected' WHERE event_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, eventId); // Set the society_id parameter
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Event with ID " + eventId + " has been rejected.");
+            } else {
+                System.out.println("No event found with ID " + eventId);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public ArrayList<Society> getAllSocieties() {
         ArrayList<Society> societies = new ArrayList<>();
@@ -854,8 +943,9 @@ public class SQLHandler extends PersistenceHandler {
                 Date date = resultSet.getDate("date");
                 Timestamp startTime = resultSet.getTimestamp("start_time");
                 Timestamp endTime = resultSet.getTimestamp("end_time");
+                String approvalStatus = resultSet.getString("approvalStatus");
 
-                Event event = new Event(eventId, societyId, eventName, eventDescription, venueId, date, startTime, endTime);
+                Event event = new Event(eventId, societyId, eventName, eventDescription, venueId, date, startTime, endTime, approvalStatus);
                 events.add(event);
             }
 

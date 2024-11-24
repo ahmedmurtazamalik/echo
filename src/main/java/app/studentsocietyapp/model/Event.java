@@ -13,8 +13,9 @@ public class Event {
     private Date date;
     private Date startTime;
     private Date endTime;
+    private String approvalStatus;
 
-    public Event(int eventId, int societyId, String eventName, String eventDescription, Integer venueId, Date date, Date startTime, Date endTime) {
+    public Event(int eventId, int societyId, String eventName, String eventDescription, Integer venueId, Date date, Date startTime, Date endTime, String approvalStatus) {
         this.eventId = eventId;
         this.societyId = societyId;
         this.eventName = eventName;
@@ -23,6 +24,7 @@ public class Event {
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.approvalStatus = approvalStatus;
     }
 
     // Getters and setters
@@ -49,5 +51,8 @@ public class Event {
 
     public Date getEndTime() { return endTime; }
     public void setEndTime(Date endTime) { this.endTime = endTime; }
+
+    public String getApprovalStatus() { return approvalStatus; }
+    public void setApprovalStatus(String approvalStatus) { this.approvalStatus = approvalStatus; }
 }
 

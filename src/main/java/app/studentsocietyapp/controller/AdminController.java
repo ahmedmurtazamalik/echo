@@ -2,7 +2,6 @@ package app.studentsocietyapp.controller;
 
 import app.studentsocietyapp.model.*;
 import app.studentsocietyapp.persistence.SQLHandler;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -87,10 +86,10 @@ public class AdminController {
     private TableColumn<Event, Integer> eventStatusColumn;
 
     @FXML
-    private TableColumn<?, ?> eventVenueButton;
+    private TableColumn<?, ?> eventVenueColumn;
 
     @FXML
-    private TableView<?> eventsTable;
+    private TableView<Event> eventsTable;
 
     @FXML
     private ImageView logoImage;
@@ -149,6 +148,30 @@ public class AdminController {
     @FXML
     private Label welcomeLabel;
 
+    @FXML
+    private Button manageVenuesButton;
+
+    @FXML
+    private AnchorPane manageVenuesPane;
+
+    @FXML
+    private TableView<Venue> venuesTable;
+
+    @FXML
+    private TableColumn<?,?> venueNameColumn;
+
+    @FXML
+    private TableColumn<?,?> venueLocationColumn;
+
+    @FXML
+    private HBox removeVenueBox;
+
+    @FXML
+    private ComboBox<Venue> removeVenueComboBox;
+
+    @FXML
+    private Button removeVenueButton;
+
     private SQLHandler sqlHandler;
 
     public void initialize() throws SQLException {
@@ -164,17 +187,20 @@ public class AdminController {
         ArrayList<Society> pendingSocieties = sqlHandler.getPendingSocieties();
         ArrayList<Society> approvedSocieties = sqlHandler.getApprovedSocieties();
         ArrayList<Event> pendingEvents = sqlHandler.getPendingEvents();
+        ArrayList<Venue> allVenues = sqlHandler.getVenues();
         ArrayList<Society> allSocieties = sqlHandler.getAllSocieties();
         ArrayList<Event> allEvents = sqlHandler.getAllEvents();
 
         ObservableList<Society> pendingSocietiesList = FXCollections.observableArrayList(pendingSocieties);
         ObservableList<Society> approvedSocietiesList = FXCollections.observableArrayList(approvedSocieties);
         ObservableList<Event> pendingEventsList = FXCollections.observableArrayList(pendingEvents);
+        ObservableList<Venue> allVenuesList = FXCollections.observableArrayList(allVenues);
 
         approveEventComboBox.setItems(pendingEventsList);
         rejectEventComboBox.setItems(pendingEventsList);
         approveSocietyComboBox.setItems(pendingSocietiesList);
         removeSocietyComboBox.setItems(approvedSocietiesList);
+        removeVenueComboBox.setItems(allVenuesList);
 
         ObservableList<Society> societiesData = FXCollections.observableArrayList(allSocieties);
         societyNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -189,22 +215,19 @@ public class AdminController {
         ObservableList<Event> eventsData = FXCollections.observableArrayList(allEvents);
         eventNameColumn.setCellValueFactory(new PropertyValueFactory<>("eventName"));
         eventSocietyColumn.setCellValueFactory(new PropertyValueFactory<>("societyId"));
-        eventVenueButton.setCellValueFactory(new PropertyValueFactory<>("venueId"));
+        eventVenueColumn.setCellValueFactory(new PropertyValueFactory<>("venueId"));
         eventDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         eventStartTimeColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
         eventEndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
-        eventStatusColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Event, Integer>, ObservableValue<Integer>>() {
-            @Override
-            public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Event, Integer> param) {
-                Event event = param.getValue();
-                int status = (event.getVenueId() != 0) ? 1 : 0; // 1 if approved, 0 if proposed
-                return new SimpleIntegerProperty(status).asObject();
-            }
-        });
+        eventStatusColumn.setCellValueFactory(new PropertyValueFactory<>("approvalStatus"));
+        eventsTable.setItems(eventsData);
 
+        venueNameColumn.setCellValueFactory(new PropertyValueFactory<>("venueName"));
+        venueLocationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+        venuesTable.setItems(allVenuesList);
     }
 
-        @FXML
+    @FXML
     void addSociety(ActionEvent event) throws SQLException {
         // Fetch the details from societyNameField, societyEmailField, societyDescriptionArea
         // Add an entry in society table with following details and approval status as 0.
@@ -309,8 +332,7 @@ public class AdminController {
             return;
         }
 
-        int societyId = societyToRemove.getSocietyId();
-        sqlHandler.removeSociety(societyId);
+        sqlHandler.removeSociety(societyToRemove.getSocietyId());
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Society removed.");
@@ -322,18 +344,93 @@ public class AdminController {
     }
 
     @FXML
-    void approveEvent(ActionEvent event) {
+    private void removeVenue() throws SQLException {
+        // removeVenueComboBox will have all venues
+        // Fetch the selected venue and delete it.
+        Venue venueToRemove = removeVenueComboBox.getSelectionModel().getSelectedItem();
+
+        if (venueToRemove == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("No venue selected.");
+            alert.setContentText("Please select a venue.");
+            alert.showAndWait();
+            return;
+        }
+
+        sqlHandler.removeVenue(venueToRemove.getVenueId());
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Venue removed.");
+        alert.setHeaderText("Success");
+        alert.setContentText("The venue has been successfully removed.");
+        alert.showAndWait();
+
+        this.initializeTables();
+    }
+
+    @FXML
+    void approveEvent(ActionEvent event) throws SQLException {
         // approveEventComboBox will have events which don't have an entry in EventScheduled table.
         // Fetch the event selected in approveEventComboBox and make relevant entry in EventScheduled table.
         Event eventToApprove = approveEventComboBox.getSelectionModel().getSelectedItem();
 
+        if (eventToApprove == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("No event selected.");
+            alert.setContentText("Please select an event.");
+            alert.showAndWait();
+            return;
+        }
+
+        sqlHandler.approveEvent(eventToApprove.getEventId());
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Event approved.");
+        alert.setHeaderText("Success");
+        alert.setContentText("The event has been successfully approved.");
+        alert.showAndWait();
+
+        makeEventPost(eventToApprove);
+        this.initializeTables();
     }
 
     @FXML
-    void rejectEvent(ActionEvent event) {
+    void makeEventPost(Event event) throws SQLException {
+        Society eventSociety = sqlHandler.getSocietyById(event.getSocietyId());
+        String postTitle = "New event by " + eventSociety.getName();
+        String postContent = postTitle + ": " + event.getEventDescription();
+
+        sqlHandler.createPost(eventSociety.getAccountId(), eventSociety.getName(), postTitle, postContent);
+
+        initializeTables();
+    }
+
+    @FXML
+    void rejectEvent(ActionEvent event) throws SQLException {
         // rejectEventComboBox will have same entries as approveEventComboBox
         // Here you just send an alert saying event successfully rejected or something, and don't make any entry in EventScheduled table.
         Event eventToReject = rejectEventComboBox.getSelectionModel().getSelectedItem();
+
+        if (eventToReject == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("No event selected.");
+            alert.setContentText("Please select an event.");
+            alert.showAndWait();
+            return;
+        }
+
+        sqlHandler.approveEvent(eventToReject.getEventId());
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Event rejected.");
+        alert.setHeaderText("Success");
+        alert.setContentText("The event has been successfully rejected.");
+        alert.showAndWait();
+
+        this.initializeTables();
     }
 
     // Navigation functions
@@ -345,6 +442,7 @@ public class AdminController {
         manageEventsPane.setVisible(false);
         addVenuePane.setVisible(false);
         manageSocietiesPane.setVisible(false);
+        manageVenuesPane.setVisible(false);
     }
 
     @FXML
@@ -355,6 +453,7 @@ public class AdminController {
         manageEventsPane.setVisible(false);
         addSocietyPane.setVisible(false);
         manageSocietiesPane.setVisible(false);
+        manageVenuesPane.setVisible(false);
     }
 
     @FXML
@@ -362,6 +461,18 @@ public class AdminController {
         // manageEventsPane = visible
         // addVenuePane, addSocietyPane, manageSocietiesPane = invisible
         manageEventsPane.setVisible(true);
+        addVenuePane.setVisible(false);
+        addSocietyPane.setVisible(false);
+        manageSocietiesPane.setVisible(false);
+        manageVenuesPane.setVisible(false);
+    }
+
+    @FXML
+    void showManageVenuesPane(ActionEvent event) {
+        // manageVenuesPane = visible
+        // manageEventsPane, addVenuePane, addSocietyPane, manageSocietiesPane = invisible
+        manageVenuesPane.setVisible(true);
+        manageEventsPane.setVisible(false);
         addVenuePane.setVisible(false);
         addSocietyPane.setVisible(false);
         manageSocietiesPane.setVisible(false);
@@ -375,6 +486,7 @@ public class AdminController {
         manageEventsPane.setVisible(false);
         addVenuePane.setVisible(false);
         addSocietyPane.setVisible(false);
+        manageVenuesPane.setVisible(false);
     }
 
 }

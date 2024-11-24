@@ -75,6 +75,7 @@ CREATE TABLE Event (
     date DATE NOT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
+    approvalStatus VARCHAR(8) NOT NULL DEFAULT 'Pending',
     FOREIGN KEY (society_id) REFERENCES Society(society_id),
     FOREIGN KEY (venue_id) REFERENCES Venue(venue_id)
 );
