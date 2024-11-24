@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefWidth="800" stylesheets="@societyview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.studentsocietyapp.controller.AdminController">
+<BorderPane prefWidth="800" stylesheets="@adminview-styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.studentsocietyapp.controller.AdminController">
    <top>
       <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #4A90E2; -fx-padding: 10;">
          <children>
@@ -39,7 +39,7 @@
          <items>
             <AnchorPane style="-fx-background-color: #B0D5F1;">
                <children>
-                  <VBox alignment="TOP_CENTER" layoutX="12.0" layoutY="44.0" spacing="20" style="-fx-padding: 20;" stylesheets="@societyview-styles.css">
+                  <VBox alignment="TOP_CENTER" layoutX="12.0" layoutY="44.0" spacing="20" style="-fx-padding: 20;" stylesheets="@adminview-styles.css">
                      <children>
                         <VBox alignment="CENTER" spacing="10">
                            <children>
@@ -129,7 +129,7 @@
                                  </children>
                               </VBox>
                            </children></AnchorPane>
-                        <AnchorPane fx:id="manageSocietiesPane" managed="true" prefHeight="491.0" prefWidth="714.0" stylesheets="@societyview-styles.css" visible="false">
+                        <AnchorPane fx:id="manageSocietiesPane" managed="true" prefHeight="491.0" prefWidth="714.0" stylesheets="@adminview-styles.css" visible="false">
                            <children>
                               <VBox alignment="TOP_CENTER" prefHeight="483.0" prefWidth="740.0" spacing="20" style="-fx-padding: 20; -fx-background-color: #E6F2FF;">
                                  <children>

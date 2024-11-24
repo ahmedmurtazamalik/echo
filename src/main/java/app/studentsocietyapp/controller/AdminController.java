@@ -2,6 +2,7 @@ package app.studentsocietyapp.controller;
 
 import app.studentsocietyapp.model.*;
 import app.studentsocietyapp.persistence.SQLHandler;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -83,7 +84,7 @@ public class AdminController {
     private TableColumn<?, ?> eventStartTimeColumn;
 
     @FXML
-    private TableColumn<?, ?> eventStatusColumn;
+    private TableColumn<Event, Integer> eventStatusColumn;
 
     @FXML
     private TableColumn<?, ?> eventVenueButton;
@@ -164,6 +165,7 @@ public class AdminController {
         ArrayList<Society> approvedSocieties = sqlHandler.getApprovedSocieties();
         ArrayList<Event> pendingEvents = sqlHandler.getPendingEvents();
         ArrayList<Society> allSocieties = sqlHandler.getAllSocieties();
+        ArrayList<Event> allEvents = sqlHandler.getAllEvents();
 
         ObservableList<Society> pendingSocietiesList = FXCollections.observableArrayList(pendingSocieties);
         ObservableList<Society> approvedSocietiesList = FXCollections.observableArrayList(approvedSocieties);
@@ -184,10 +186,26 @@ public class AdminController {
         });
         allsocietiesTable.setItems(societiesData);
 
+        ObservableList<Event> eventsData = FXCollections.observableArrayList(allEvents);
+        eventNameColumn.setCellValueFactory(new PropertyValueFactory<>("eventName"));
+        eventSocietyColumn.setCellValueFactory(new PropertyValueFactory<>("societyId"));
+        eventVenueButton.setCellValueFactory(new PropertyValueFactory<>("venueId"));
+        eventDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        eventStartTimeColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+        eventEndTimeColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+        eventStatusColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Event, Integer>, ObservableValue<Integer>>() {
+            @Override
+            public ObservableValue<Integer> call(TableColumn.CellDataFeatures<Event, Integer> param) {
+                Event event = param.getValue();
+                int status = (event.getVenueId() != 0) ? 1 : 0; // 1 if approved, 0 if proposed
+                return new SimpleIntegerProperty(status).asObject();
+            }
+        });
+
     }
 
         @FXML
-    void addSociety(ActionEvent event) {
+    void addSociety(ActionEvent event) throws SQLException {
         // Fetch the details from societyNameField, societyEmailField, societyDescriptionArea
         // Add an entry in society table with following details and approval status as 0.
         // (This just acts as creating a society profile)
@@ -217,13 +235,14 @@ public class AdminController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Society Added");
         alert.setHeaderText("Success");
-        alert.setContentText("Your post has been successfully created.");
+        alert.setContentText("Society has been successfully created.");
         alert.showAndWait();
 
+        this.initializeTables();
     }
 
     @FXML
-    void addVenue(ActionEvent event) {
+    void addVenue(ActionEvent event) throws SQLException {
         // Fetch details from venueNameField, venueLocationField and add an entry in venue table with these details.
         String venueName = venueNameField.getText();
         String venueLocation = venueLocationField.getText();
@@ -242,25 +261,64 @@ public class AdminController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Venue Added");
         alert.setHeaderText("Success");
-        alert.setContentText("Your venue has been successfully created.");
+        alert.setContentText("Venue has been successfully created.");
         alert.showAndWait();
+
+        this.initializeTables();
     }
 
     @FXML
-    void approveSociety(ActionEvent event) {
+    void approveSociety(ActionEvent event) throws SQLException {
         // approveSocietyComboBox will have the societies whose approval status bits are 0.
         // Fetch the selected society and set its approval status bit to 1.
         Society societyToApprove = approveSocietyComboBox.getSelectionModel().getSelectedItem();
 
+        if (societyToApprove == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("No society selected.");
+            alert.setContentText("Please select a society.");
+            alert.showAndWait();
+            return;
+        }
 
+        int societyId = societyToApprove.getSocietyId();
+        sqlHandler.approveSociety(societyId);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Society approved!");
+        alert.setHeaderText("Success");
+        alert.setContentText("The society has been successfully approved.");
+        alert.showAndWait();
+
+        this.initializeTables();
     }
 
     @FXML
-    void removeSociety(ActionEvent event) {
+    void removeSociety(ActionEvent event) throws SQLException {
         // removeSocietyComboBox will have societies whose approval bits are 1
         // Fetch the selected society and set its approval status to 0.
         Society societyToRemove = removeSocietyComboBox.getSelectionModel().getSelectedItem();
 
+        if (societyToRemove == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid Input");
+            alert.setHeaderText("No society selected.");
+            alert.setContentText("Please select a society.");
+            alert.showAndWait();
+            return;
+        }
+
+        int societyId = societyToRemove.getSocietyId();
+        sqlHandler.removeSociety(societyId);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Society removed.");
+        alert.setHeaderText("Success");
+        alert.setContentText("The society has been successfully removed.");
+        alert.showAndWait();
+
+        this.initializeTables();
     }
 
     @FXML
