@@ -106,6 +106,10 @@ public class MainController {
                     System.out.println("Society Name: " + society.getName());
                     societyController.setSocietyDetails(society);
                 }
+                else {
+                    showErrorAlert("Invalid login","Society is not approved, please contact admin!");
+                    return;
+                }
             } else if (accountType == 3) {
                 AdminController adminController = loader.getController();
                 System.out.println("Admin Woo");

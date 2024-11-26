@@ -15,7 +15,7 @@ public class SQLHandler extends PersistenceHandler {
 
     private static final String connectionString = "jdbc:mysql://localhost:3306/echodb";
     private static final String username = "root";
-    private static final String password = "";
+    private static final String password = "03230";
 
     private static SQLHandler instance = null;
 

@@ -466,7 +466,13 @@ public class StudentController {
         } else {
             commentsContent.append("Comments:\n\n");
             for (int i = 0; i < comments.size(); i++) {
-                commentsContent.append(i + 1).append(". ").append(comments.get(i).getContent()).append("\n");
+                Comment comment = comments.get(i);
+                commentsContent.append(i + 1).append(". ")
+                        .append(comment.getContent())
+                        .append("\n   - Posted by: ")
+                        .append(comment.getStudentName())
+                        .append("\n")
+                        .append("\n");
             }
         }
 
@@ -486,7 +492,13 @@ public class StudentController {
         } else {
             commentsContent.append("Comments:\n\n");
             for (int i = 0; i < comments.size(); i++) {
-                commentsContent.append(i + 1).append(". ").append(comments.get(i).getContent()).append("\n");
+                Comment comment = comments.get(i);
+                commentsContent.append(i + 1).append(". ")
+                        .append(comment.getContent())
+                        .append("\n   - Posted by: ")
+                        .append(comment.getStudentName())
+                        .append("\n")
+                        .append("\n");
             }
         }
 

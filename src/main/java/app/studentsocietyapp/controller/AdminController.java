@@ -184,7 +184,7 @@ public class AdminController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
         String formattedDate = currentDate.format(formatter);
         dateLabel.setText(formattedDate);
-        welcomeLabel.setText("Welcome, ");
+        welcomeLabel.setText("Welcome, Admin");
     }
 
     private void setSqlHandler() {
@@ -400,17 +400,17 @@ public class AdminController {
         alert.setContentText("The event has been successfully approved.");
         alert.showAndWait();
 
-        makeEventPost(eventToApprove);
+        makeEventAnnouncement(eventToApprove);
         this.initializeTables();
     }
 
     @FXML
-    void makeEventPost(Event event) throws SQLException {
+    void makeEventAnnouncement(Event event) throws SQLException {
         Society eventSociety = sqlHandler.getSocietyById(event.getSocietyId());
         String postTitle = "New event by " + eventSociety.getName();
         String postContent = postTitle + ": " + event.getEventDescription();
 
-        sqlHandler.createPost(eventSociety.getAccountId(), eventSociety.getName(), postTitle, postContent);
+        sqlHandler.createAnnouncement(eventSociety.getAccountId(), eventSociety.getName(), postTitle, postContent);
 
         initializeTables();
     }
@@ -430,7 +430,7 @@ public class AdminController {
             return;
         }
 
-        sqlHandler.approveEvent(eventToReject.getEventId());
+        sqlHandler.rejectEvent(eventToReject.getEventId());
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Event rejected.");
